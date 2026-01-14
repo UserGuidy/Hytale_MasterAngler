@@ -4,9 +4,9 @@ plugins {
     id("run-hytale")
 }
 
-group = findProperty("pluginGroup") as String? ?: "com.example"
+group = findProperty("pluginGroup") as String? ?: "com.masterangler"
 version = findProperty("pluginVersion") as String? ?: "1.0.0"
-description = findProperty("pluginDescription") as String? ?: "A Hytale plugin template"
+description = findProperty("pluginDescription") as String? ?: "Hytale Master Angler Plugin"
 
 repositories {
     mavenLocal()

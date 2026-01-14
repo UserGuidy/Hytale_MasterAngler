@@ -1,30 +1,28 @@
-package com.example.templateplugin;
+package com.masterangler;
 
 /**
- * Main plugin class.
+ * Main plugin class for Hytale Master Angler.
  * 
- * TODO: Implement your plugin logic here.
- * 
- * @author YourName
+ * @author Jules
  * @version 1.0.0
  */
-public class TemplatePlugin {
+public class MasterAnglerPlugin {
 
-    private static TemplatePlugin instance;
+    private static MasterAnglerPlugin instance;
     
     /**
      * Constructor - Called when plugin is loaded.
      */
-    public TemplatePlugin() {
+    public MasterAnglerPlugin() {
         instance = this;
-        System.out.println("[TemplatePlugin] Plugin loaded!");
+        System.out.println("[MasterAnglerPlugin] Plugin loaded!");
     }
     
     /**
      * Called when plugin is enabled.
      */
     public void onEnable() {
-        System.out.println("[TemplatePlugin] Plugin enabled!");
+        System.out.println("[MasterAnglerPlugin] Plugin enabled!");
         
         // TODO: Initialize your plugin here
         // - Load configuration
@@ -37,7 +35,7 @@ public class TemplatePlugin {
      * Called when plugin is disabled.
      */
     public void onDisable() {
-        System.out.println("[TemplatePlugin] Plugin disabled!");
+        System.out.println("[MasterAnglerPlugin] Plugin disabled!");
         
         // TODO: Cleanup your plugin here
         // - Save data
@@ -48,7 +46,7 @@ public class TemplatePlugin {
     /**
      * Get plugin instance.
      */
-    public static TemplatePlugin getInstance() {
+    public static MasterAnglerPlugin getInstance() {
         return instance;
     }
 }
