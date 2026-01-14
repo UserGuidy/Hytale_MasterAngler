@@ -1,0 +1,12 @@
+{
+  "name": "Clownfish",
+  "minWeight": 0.1,
+  "maxWeight": 0.3,
+  "minSize": 5.0,
+  "maxSize": 10.0,
+  "fishStrength": 1.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 15,
+  "preferredBaits": ["bread_bait", "worm_bait"]
+}

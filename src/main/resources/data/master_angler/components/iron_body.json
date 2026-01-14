@@ -1,0 +1,10 @@
+{
+  "id": "iron_body",
+  "name": "Iron Reinforced Body",
+  "type": "BODY",
+  "color": "#A9A9A9",
+  "fishingPower": 8.0,
+  "durability": 150.0,
+  "weight": 1.5,
+  "maxWeightCapacity": 15.0
+}

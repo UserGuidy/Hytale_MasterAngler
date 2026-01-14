@@ -1,0 +1,8 @@
+{
+  "id": "cotton_line",
+  "name": "Cotton Line",
+  "type": "LINE",
+  "maxTension": 8.0,
+  "flexibility": 0.4,
+  "breakingStrength": 4.0
+}

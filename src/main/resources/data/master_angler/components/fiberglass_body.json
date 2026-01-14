@@ -1,0 +1,10 @@
+{
+  "id": "fiberglass_body",
+  "name": "Fiberglass Body",
+  "type": "BODY",
+  "color": "#C0C0C0",
+  "fishingPower": 5.0,
+  "durability": 100.0,
+  "weight": 0.5,
+  "maxWeightCapacity": 10.0
+}

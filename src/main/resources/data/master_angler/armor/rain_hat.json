@@ -1,0 +1,6 @@
+{
+  "type": "HAT",
+  "waterResistance": 0.2,
+  "fishingPowerBonus": 2.0,
+  "setId": "set_rain_gear"
+}

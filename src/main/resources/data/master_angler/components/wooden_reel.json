@@ -1,0 +1,8 @@
+{
+  "id": "wooden_reel",
+  "name": "Wooden Reel",
+  "type": "REEL",
+  "color": "#8B4513",
+  "reelSpeed": 4.0,
+  "afkEfficiency": 0.2
+}

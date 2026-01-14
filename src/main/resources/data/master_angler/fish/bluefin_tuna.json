@@ -1,0 +1,12 @@
+{
+  "name": "Bluefin Tuna",
+  "minWeight": 20.0,
+  "maxWeight": 200.0,
+  "minSize": 100.0,
+  "maxSize": 300.0,
+  "fishStrength": 25.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 500,
+  "preferredBaits": ["squid_strip", "cut_bait"]
+}

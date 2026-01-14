@@ -1,0 +1,8 @@
+{
+  "id": "titanium_reel",
+  "name": "Titanium Reel",
+  "type": "REEL",
+  "color": "#808080",
+  "reelSpeed": 12.0,
+  "afkEfficiency": 0.8
+}

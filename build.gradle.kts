@@ -4,9 +4,9 @@ plugins {
     id("run-hytale")
 }
 
-group = findProperty("pluginGroup") as String? ?: "com.example"
+group = findProperty("pluginGroup") as String? ?: "com.masterangler"
 version = findProperty("pluginVersion") as String? ?: "1.0.0"
-description = findProperty("pluginDescription") as String? ?: "A Hytale plugin template"
+description = findProperty("pluginDescription") as String? ?: "Hytale Master Angler Plugin"
 
 repositories {
     mavenLocal()
@@ -37,7 +37,7 @@ tasks {
     // Configure Java compilation
     compileJava {
         options.encoding = Charsets.UTF_8.name()
-        options.release = 25
+        options.release = 21
     }
     
     // Configure resource processing
@@ -83,6 +83,6 @@ tasks {
 // Configure Java toolchain
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }

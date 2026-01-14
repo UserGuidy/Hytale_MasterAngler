@@ -1,0 +1,8 @@
+{
+  "id": "silk_line",
+  "name": "Spider Silk Line",
+  "type": "LINE",
+  "maxTension": 12.0,
+  "flexibility": 0.6,
+  "breakingStrength": 6.0
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Yellow Perch",
+  "minWeight": 0.1,
+  "maxWeight": 1.0,
+  "minSize": 10.0,
+  "maxSize": 35.0,
+  "fishStrength": 2.0,
+  "biomeID": "river",
+  "weatherMultiplier": 1.0,
+  "xpReward": 25,
+  "preferredBaits": ["worm_bait", "fly_bait"]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Arapaima",
+  "minWeight": 40.0,
+  "maxWeight": 200.0,
+  "minSize": 150.0,
+  "maxSize": 300.0,
+  "fishStrength": 35.0,
+  "biomeID": "swamp",
+  "weatherMultiplier": 1.3,
+  "xpReward": 600,
+  "preferredBaits": ["frog_lure", "cut_bait"]
+}

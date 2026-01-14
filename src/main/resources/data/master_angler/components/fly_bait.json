@@ -1,0 +1,7 @@
+{
+  "id": "fly_bait",
+  "name": "Artificial Fly",
+  "type": "BAIT",
+  "attractivity": 1.5,
+  "catchRate": 1.3
+}

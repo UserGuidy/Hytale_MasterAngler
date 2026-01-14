@@ -1,17 +1,17 @@
 {
-  "Group": "TemplatePlugin",
-  "Name": "TemplatePlugin",
+  "Group": "com.masterangler",
+  "Name": "Hytale Master Angler",
   "Version": "1.0.0",
-  "Description": "A Hytale plugin template",
+  "Description": "Hytale Master Angler Plugin",
   "Authors": [
     {
-      "Name": "YourName",
-      "Email": "your.email@example.com",
-      "Url": "https://your-website.com"
+      "Name": "Jules",
+      "Email": "jules@example.com",
+      "Url": "https://github.com/masterangler"
     }
   ],
-  "Website": "https://github.com/yourusername/hytale-plugin-template",
-  "Main": "com.example.templateplugin.TemplatePlugin",
+  "Website": "https://github.com/masterangler",
+  "Main": "com.masterangler.MasterAnglerPlugin",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},

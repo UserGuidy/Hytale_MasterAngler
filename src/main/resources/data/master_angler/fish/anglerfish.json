@@ -1,0 +1,12 @@
+{
+  "name": "Deep Sea Anglerfish",
+  "minWeight": 2.0,
+  "maxWeight": 20.0,
+  "minSize": 30.0,
+  "maxSize": 100.0,
+  "fishStrength": 15.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 150,
+  "preferredBaits": ["frog_lure", "cut_bait"]
+}

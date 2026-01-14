@@ -1,0 +1,12 @@
+{
+  "name": "Grayling",
+  "minWeight": 0.3,
+  "maxWeight": 1.5,
+  "minSize": 20.0,
+  "maxSize": 50.0,
+  "fishStrength": 4.0,
+  "biomeID": "river",
+  "weatherMultiplier": 1.0,
+  "xpReward": 40,
+  "preferredBaits": ["fly_bait", "worm_bait"]
+}

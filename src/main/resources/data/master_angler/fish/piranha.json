@@ -1,0 +1,12 @@
+{
+  "name": "Piranha",
+  "minWeight": 0.5,
+  "maxWeight": 3.0,
+  "minSize": 15.0,
+  "maxSize": 40.0,
+  "fishStrength": 5.0,
+  "biomeID": "swamp",
+  "weatherMultiplier": 1.0,
+  "xpReward": 45,
+  "preferredBaits": ["cut_bait", "worm_bait"]
+}

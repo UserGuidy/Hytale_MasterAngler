@@ -1,0 +1,7 @@
+{
+  "id": "frog_lure",
+  "name": "Frog Lure",
+  "type": "BAIT",
+  "attractivity": 1.7,
+  "catchRate": 1.4
+}

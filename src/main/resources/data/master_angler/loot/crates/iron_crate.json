@@ -1,0 +1,7 @@
+{
+  "id": "iron_crate",
+  "name": "Iron Crate",
+  "minPowerRequired": 10.0,
+  "rarity": 0.05,
+  "lootTable": ["iron_ingot", "fiberglass_sheet", "synthetic_polymer", "ceramic_parts"]
+}

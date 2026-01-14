@@ -1,0 +1,12 @@
+{
+  "name": "Swordfish",
+  "minWeight": 50.0,
+  "maxWeight": 250.0,
+  "minSize": 150.0,
+  "maxSize": 450.0,
+  "fishStrength": 40.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.2,
+  "xpReward": 800,
+  "preferredBaits": ["squid_strip", "cut_bait"]
+}
