@@ -1,0 +1,8 @@
+{
+  "id": "fluorocarbon_line",
+  "name": "Fluorocarbon Line",
+  "type": "LINE",
+  "maxTension": 25.0,
+  "flexibility": 0.1,
+  "breakingStrength": 15.0
+}

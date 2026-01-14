@@ -1,0 +1,9 @@
+{
+  "id": "carbon_body",
+  "name": "Carbon Fiber Body",
+  "type": "BODY",
+  "color": "#1A1A1A",
+  "durability": 200.0,
+  "weight": 0.3,
+  "maxWeightCapacity": 25.0
+}
