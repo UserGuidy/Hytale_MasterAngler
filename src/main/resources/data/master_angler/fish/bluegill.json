@@ -1,7 +1,9 @@
 {
   "name": "Bluegill",
-  "weight": 0.5,
+  "minWeight": 0.2,
+  "maxWeight": 0.8,
   "fishStrength": 2.0,
   "biomeID": "river",
-  "weatherMultiplier": 1.0
+  "weatherMultiplier": 1.0,
+  "xpReward": 10
 }

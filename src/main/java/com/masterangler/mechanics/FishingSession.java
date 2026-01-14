@@ -9,9 +9,10 @@ public class FishingSession {
     private Player player;
     private DynamicRod rod;
     private float currentTension = 0.0f;
+    private float catchProgress = 0.0f; // 0.0 to 1.0 (100%)
     private boolean isFishHooked = false;
+    private com.masterangler.data.FishDefinition hookedFish;
     private float hookedFishWeight = 0.0f;
-    private float hookedFishStrength = 0.0f;
 
     // Status flags
     private boolean reeling = false;
@@ -37,14 +38,26 @@ public class FishingSession {
         this.currentTension = tension;
     }
 
+    public float getCatchProgress() {
+        return catchProgress;
+    }
+
+    public void setCatchProgress(float progress) {
+        this.catchProgress = progress;
+    }
+
     public boolean isFishHooked() {
         return isFishHooked;
     }
 
-    public void hookFish(float weight, float strength) {
+    public void hookFish(com.masterangler.data.FishDefinition fish, float weight) {
         this.isFishHooked = true;
+        this.hookedFish = fish;
         this.hookedFishWeight = weight;
-        this.hookedFishStrength = strength;
+    }
+
+    public com.masterangler.data.FishDefinition getHookedFish() {
+        return hookedFish;
     }
 
     public float getHookedFishWeight() {
@@ -52,7 +65,7 @@ public class FishingSession {
     }
 
     public float getHookedFishStrength() {
-        return hookedFishStrength;
+        return hookedFish != null ? hookedFish.getFishStrength() : 0.0f;
     }
 
     public void setReeling(boolean reeling) {

@@ -38,6 +38,20 @@ public class MasterAnglerPlugin {
         com.masterangler.mock.EventBus eventBus = new com.masterangler.mock.EventBus();
         eventBus.register(eventHandler);
 
+        // Initialize Data
+        com.masterangler.data.DataLoader dataLoader = new com.masterangler.data.DataLoader();
+        dataLoader.loadFishDefinitions();
+
+        // Initialize Gameplay Managers
+        com.masterangler.mechanics.FishSpawnManager spawnManager = new com.masterangler.mechanics.FishSpawnManager(dataLoader);
+        com.masterangler.data.PersistenceManager persistenceManager = new com.masterangler.data.PersistenceManager();
+
+        // Update Event Handler with SpawnManager
+        eventHandler.setSpawnManager(spawnManager);
+
+        // Inject Persistence into Level Manager (Manual wiring for Phase 2)
+        levelManager.setPersistenceManager(persistenceManager);
+
         System.out.println("[MasterAnglerPlugin] Systems initialized.");
     }
 

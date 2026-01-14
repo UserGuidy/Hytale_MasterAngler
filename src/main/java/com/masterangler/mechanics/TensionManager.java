@@ -57,4 +57,23 @@ public class TensionManager {
         // Send to client
         context.sendPacket(player, packet);
     }
+
+    /**
+     * Calculates the progress of the catch.
+     *
+     * @param reeling Whether the player is reeling.
+     * @param currentTension Current line tension.
+     * @param safeTensionThreshold The tension threshold below which reeling is effective.
+     * @return The delta progress to add.
+     */
+    public float calculateProgressDelta(boolean reeling, float currentTension, float safeTensionThreshold) {
+        if (reeling && currentTension < safeTensionThreshold) {
+            // Effective reeling increases progress
+            return 0.05f; // 5% per tick example
+        } else if (currentTension > safeTensionThreshold) {
+            // High tension might cause progress to slip back slightly
+            return -0.01f;
+        }
+        return 0.0f;
+    }
 }

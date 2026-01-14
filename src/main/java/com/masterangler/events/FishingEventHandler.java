@@ -17,7 +17,8 @@ public class FishingEventHandler {
     private TensionManager tensionManager;
     private FishingPlayerLevelManager levelManager;
     private ServerContext serverContext;
-    private FishingWorkbenchManager workbenchManager; // Needed to get rod stats from item (mock)
+    private FishingWorkbenchManager workbenchManager;
+    private com.masterangler.mechanics.FishSpawnManager spawnManager;
 
     public FishingEventHandler(FishingSessionManager sessionManager,
                                TensionManager tensionManager,
@@ -27,14 +28,16 @@ public class FishingEventHandler {
         this.tensionManager = tensionManager;
         this.levelManager = levelManager;
         this.serverContext = serverContext;
-        this.workbenchManager = new FishingWorkbenchManager(); // In real app, dependency injection
+        this.workbenchManager = new FishingWorkbenchManager();
+    }
+
+    public void setSpawnManager(com.masterangler.mechanics.FishSpawnManager spawnManager) {
+        this.spawnManager = spawnManager;
     }
 
     // Launch Fishing
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getItem() != null && event.getItem().getItem().hasTag("fishing_rod")) {
-            // In a real scenario, we would retrieve the DynamicRod data attached to the ItemStack.
-            // For this mock/phase 1, we assume a default rod is being used.
              // Mocking a rod assembly for the session
              DynamicRod rod = workbenchManager.assembleRod(
                  new com.masterangler.gear.RodBody(100f, 1f, 50f),
@@ -45,9 +48,21 @@ public class FishingEventHandler {
 
             if (sessionManager.getSession(event.getPlayer()) == null) {
                 sessionManager.startSession(event.getPlayer(), rod);
-                // Simulate hooking a fish immediately for testing Phase 1 mechanics
+
+                // Hook logic
                 FishingSession session = sessionManager.getSession(event.getPlayer());
-                session.hookFish(5.0f, 10.0f); // 5kg fish, 10 strength
+
+                if (spawnManager != null) {
+                    // Mock environment
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait());
+                    if (fishDef != null) {
+                        float weight = spawnManager.generateWeight(fishDef);
+                        session.hookFish(fishDef, weight);
+                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg)");
+                    } else {
+                        System.out.println("No fish bit.");
+                    }
+                }
             }
         }
     }
@@ -86,10 +101,29 @@ public class FishingEventHandler {
 
              boolean isBroken = newTension > session.getRod().getLine().getMaxTension();
 
+             // Catch Progress Logic
+             float progressDelta = tensionManager.calculateProgressDelta(
+                 session.isReeling(),
+                 newTension,
+                 session.getRod().getLine().getMaxTension() * 0.8f // Safe zone is 80% of max tension
+             );
+             float newProgress = session.getCatchProgress() + progressDelta;
+             if (newProgress < 0) newProgress = 0;
+             session.setCatchProgress(newProgress);
+
              // Sync
              tensionManager.updateAndSync(serverContext, event.getPlayer(), newTension, isBroken);
 
              if (isBroken) {
+                 System.out.println("Line broken! Fish lost.");
+                 sessionManager.endSession(event.getPlayer());
+             } else if (newProgress >= 1.0f) {
+                 // WIN CONDITION
+                 com.masterangler.data.FishDefinition fish = session.getHookedFish();
+                 System.out.println("CAUGHT FISH: " + fish.getName() + " | XP: " + fish.getXpReward());
+
+                 levelManager.addXp(event.getPlayer(), fish.getXpReward());
+
                  sessionManager.endSession(event.getPlayer());
              }
         }
