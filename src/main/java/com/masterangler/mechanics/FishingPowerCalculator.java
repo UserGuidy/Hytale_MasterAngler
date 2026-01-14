@@ -10,17 +10,13 @@ public class FishingPowerCalculator {
         float power = 0.0f;
 
         if (rod != null) {
-            // Base power from gear
-            // Line strength is the primary factor for handling heavy fish
-            power += rod.getLine().getBreakingStrength();
-
-            // Reel speed adds a bit of "efficiency" power
-            power += rod.getReel().getReelSpeed() * 0.5f;
+            // Base power from Rod Body (Primary source of power)
+            power += rod.getBody().getFishingPower();
         }
 
         if (player != null && armorManager != null) {
-            // Luck bonus directly adds to "effective" power for rarity checks
-            power += armorManager.getTotalLuckBonus(player) * 10.0f; // Scale luck to power
+            // Power bonus from Armor
+            power += armorManager.getTotalFishingPowerBonus(player);
         }
 
         return power;

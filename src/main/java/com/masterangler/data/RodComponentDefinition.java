@@ -13,6 +13,7 @@ public class RodComponentDefinition {
     private String color; // Hex code or name
 
     // Union of all possible stats (some will be 0/null depending on type)
+    private float fishingPower;      // Body (New: Primary stat for catching rarity)
     private float durability;        // Body
     private float weight;            // Body
     private float maxWeightCapacity; // Body
@@ -33,6 +34,7 @@ public class RodComponentDefinition {
 
     public String getColor() { return color; }
 
+    public float getFishingPower() { return fishingPower; }
     public float getDurability() { return durability; }
     public float getWeight() { return weight; }
     public float getMaxWeightCapacity() { return maxWeightCapacity; }

@@ -1,0 +1,12 @@
+{
+  "name": "Mackerel",
+  "minWeight": 0.2,
+  "maxWeight": 1.5,
+  "minSize": 20.0,
+  "maxSize": 45.0,
+  "fishStrength": 3.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 35,
+  "preferredBaits": ["squid_strip", "fly_bait"]
+}

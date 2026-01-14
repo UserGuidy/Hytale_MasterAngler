@@ -1,5 +1,5 @@
 {
   "type": "BOOTS",
   "waterResistance": 0.5,
-  "fishingLuckBonus": 0.0
+  "fishingPowerBonus": 1.0
 }

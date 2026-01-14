@@ -55,17 +55,9 @@ public class FishSpawnManager {
             return null;
         }
 
-        // Apply Luck Bonus
-        float luckBonus = 0.0f;
-        if (armorManager != null && player != null) {
-            luckBonus = armorManager.getTotalLuckBonus(player);
-        }
-
-        // Boost rarity chance based on fishing power
-        // (Mock logic: Higher power = slightly higher chance to reroll for a stronger fish)
-
         // Treasure / Crate Check
-        // Priority: Crate (if power high enough) > Loot (Luck) > Fish
+        // Priority: Crate (if power high enough) > Fish
+        // Note: Removed "Luck" concept for treasure, now tied to power/random like fish
 
         if (crateManager != null && random.nextFloat() < 0.05f) { // 5% base chance for crate
              com.masterangler.data.CrateDefinition crate = crateManager.rollForCrate(fishingPower);
@@ -76,10 +68,10 @@ public class FishSpawnManager {
                  return null;
              }
         } else if (lootManager != null) {
-            com.masterangler.data.LootDefinition loot = lootManager.rollForTreasure(luckBonus);
-            if (loot != null) {
-                System.out.println("Wait! You feel something heavy... it's a " + loot.getName());
-            }
+            // Deprecated luck-based treasure logic replaced by pure randomness for now
+            // or we can reuse fishingPower as a luck factor if desired.
+            // For now, keep simple random check inside manager or skip.
+            // com.masterangler.data.LootDefinition loot = lootManager.rollForTreasure(0.0f);
         }
 
         // Weighted Fish Selection

@@ -85,8 +85,11 @@ public class AfkFishingManager {
 
             if (random.nextFloat() < catchChance) {
                 // SUCCESS
-                // AFK Fishing Power assumption: Rod strength + basic reel factor
-                float power = tripod.rod.getLine().getBreakingStrength() + (tripod.rod.getReel().getReelSpeed() * 0.2f);
+                // AFK Fishing Power: Uses Rod Body Power + Owner Armor (if available via Calculator)
+                // Note: We use a static helper, need to ensure armor manager is accessible if we want armor bonuses.
+                // For now, simpler approach: Just use Rod Body Power + simple armor lookup if we had the manager instance.
+                // Since AfkFishingManager doesn't hold ArmorManager, we rely on Rod Body Power primarily.
+                float power = tripod.rod.getBody().getFishingPower();
 
                 FishDefinition fish = spawnManager.selectFish("river", "clear", tripod.rod.getBait(), tripod.owner, power);
                 if (fish != null) {

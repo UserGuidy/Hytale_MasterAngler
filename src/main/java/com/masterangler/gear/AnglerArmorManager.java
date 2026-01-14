@@ -20,7 +20,7 @@ public class AnglerArmorManager {
 
     public void equipArmor(Player player, AnglerArmor armor) {
         equippedArmor.computeIfAbsent(player, k -> new HashMap<>()).put(armor.getType(), armor);
-        System.out.println(player.getName() + " equipped " + armor.getType() + " (+Luck: " + armor.getFishingLuckBonus() + ")");
+        System.out.println(player.getName() + " equipped " + armor.getType() + " (+Power: " + armor.getFishingPowerBonus() + ")");
     }
 
     // Helper to equip by ID (from command or JSON)
@@ -41,12 +41,12 @@ public class AnglerArmorManager {
         }
     }
 
-    public float getTotalLuckBonus(Player player) {
+    public float getTotalFishingPowerBonus(Player player) {
         if (!equippedArmor.containsKey(player)) return 0.0f;
 
         Map<AnglerArmor.ArmorType, AnglerArmor> pieces = equippedArmor.get(player);
         float total = (float) pieces.values().stream()
-                .mapToDouble(AnglerArmor::getFishingLuckBonus)
+                .mapToDouble(AnglerArmor::getFishingPowerBonus)
                 .sum();
 
         // Check Set Bonus

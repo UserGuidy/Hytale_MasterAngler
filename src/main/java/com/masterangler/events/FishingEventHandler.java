@@ -59,7 +59,7 @@ public class FishingEventHandler {
         if (event.getItem() != null && event.getItem().getItem().hasTag("fishing_rod")) {
              // Mocking a rod assembly for the session
              DynamicRod rod = workbenchManager.assembleRod(
-                 new com.masterangler.gear.RodBody(100f, 1f, 50f),
+                 new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"), // Power 5.0
                  new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
                  new com.masterangler.gear.RodReel(5f, 1f),
                  new com.masterangler.gear.RodBait(1f, 1f)

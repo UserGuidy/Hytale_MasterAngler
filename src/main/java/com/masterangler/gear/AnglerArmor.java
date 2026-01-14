@@ -7,22 +7,22 @@ public class AnglerArmor {
 
     private ArmorType type;
     private float waterResistance;
-    private float fishingLuckBonus;
-    private String setId; // e.g., "set_rain_gear"
+    private float fishingPowerBonus; // Renamed from luck, as it contributes to Fishing Power
+    private String setId;
 
-    public AnglerArmor(ArmorType type, float waterResistance, float fishingLuckBonus) {
-        this(type, waterResistance, fishingLuckBonus, null);
+    public AnglerArmor(ArmorType type, float waterResistance, float fishingPowerBonus) {
+        this(type, waterResistance, fishingPowerBonus, null);
     }
 
-    public AnglerArmor(ArmorType type, float waterResistance, float fishingLuckBonus, String setId) {
+    public AnglerArmor(ArmorType type, float waterResistance, float fishingPowerBonus, String setId) {
         this.type = type;
         this.waterResistance = waterResistance;
-        this.fishingLuckBonus = fishingLuckBonus;
+        this.fishingPowerBonus = fishingPowerBonus;
         this.setId = setId;
     }
 
     public ArmorType getType() { return type; }
     public float getWaterResistance() { return waterResistance; }
-    public float getFishingLuckBonus() { return fishingLuckBonus; }
+    public float getFishingPowerBonus() { return fishingPowerBonus; }
     public String getSetId() { return setId; }
 }

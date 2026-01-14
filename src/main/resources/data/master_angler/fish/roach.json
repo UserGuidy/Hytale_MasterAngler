@@ -1,0 +1,12 @@
+{
+  "name": "Roach",
+  "minWeight": 0.1,
+  "maxWeight": 0.8,
+  "minSize": 10.0,
+  "maxSize": 30.0,
+  "fishStrength": 1.5,
+  "biomeID": "river",
+  "weatherMultiplier": 1.0,
+  "xpReward": 20,
+  "preferredBaits": ["bread_bait", "corn_bait"]
+}

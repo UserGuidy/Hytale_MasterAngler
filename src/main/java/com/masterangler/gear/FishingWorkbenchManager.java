@@ -65,7 +65,7 @@ public class FishingWorkbenchManager {
         }
 
         switch (expectedType) {
-            case BODY: return new RodBody(def.getDurability(), def.getWeight(), def.getMaxWeightCapacity(), def.getColor());
+            case BODY: return new RodBody(def.getDurability(), def.getWeight(), def.getMaxWeightCapacity(), def.getFishingPower(), def.getColor());
             case LINE: return new RodLine(def.getMaxTension(), def.getFlexibility(), def.getBreakingStrength());
             case REEL: return new RodReel(def.getReelSpeed(), def.getAfkEfficiency(), def.getColor());
             case BAIT: return new RodBait(def.getId(), def.getAttractivity(), def.getCatchRate());
