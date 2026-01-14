@@ -29,7 +29,15 @@ public class FishingEventHandler {
         this.tensionManager = tensionManager;
         this.levelManager = levelManager;
         this.serverContext = serverContext;
+        // Workbench is now initialized in Main and passed (or we can keep local default for simple tests,
+        // but better to allow injection if we want the data loader connected).
+        // For this patch, we'll keep the local new() but it won't have the DataLoader unless set.
+        // Ideally, we should refactor constructor to accept it.
         this.workbenchManager = new FishingWorkbenchManager();
+    }
+
+    public void setWorkbenchManager(FishingWorkbenchManager workbenchManager) {
+        this.workbenchManager = workbenchManager;
     }
 
     public void setSpawnManager(com.masterangler.mechanics.FishSpawnManager spawnManager) {
@@ -59,7 +67,7 @@ public class FishingEventHandler {
 
                 if (spawnManager != null) {
                     // Mock environment
-                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait());
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), event.getPlayer());
                     if (fishDef != null) {
                         float weight = spawnManager.generateWeight(fishDef);
                         session.hookFish(fishDef, weight);

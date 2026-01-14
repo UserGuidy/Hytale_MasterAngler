@@ -5,10 +5,10 @@ import com.masterangler.gear.DynamicRod;
 import com.masterangler.mock.BlockPosition;
 import com.masterangler.mock.Player;
 import com.masterangler.progression.FishingPlayerLevelManager;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AfkFishingManager {
 
@@ -24,11 +24,12 @@ public class AfkFishingManager {
         }
     }
 
-    private Map<BlockPosition, TripodEntry> activeTripods = new HashMap<>();
+    private Map<BlockPosition, TripodEntry> activeTripods = new ConcurrentHashMap<>();
     private FishSpawnManager spawnManager;
     private FishingPlayerLevelManager levelManager;
     private Random random = new Random();
     private static final long TICK_INTERVAL_MS = 1000; // Check every second
+    private volatile boolean running = true;
 
     public AfkFishingManager(FishSpawnManager spawnManager, FishingPlayerLevelManager levelManager) {
         this.spawnManager = spawnManager;
@@ -47,7 +48,17 @@ public class AfkFishingManager {
         activeTripods.remove(pos);
     }
 
+    public void stop() {
+        this.running = false;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
     public void tick() {
+        if (!running) return;
+
         long now = System.currentTimeMillis();
 
         Iterator<Map.Entry<BlockPosition, TripodEntry>> it = activeTripods.entrySet().iterator();
@@ -74,7 +85,7 @@ public class AfkFishingManager {
 
             if (random.nextFloat() < catchChance) {
                 // SUCCESS
-                FishDefinition fish = spawnManager.selectFish("river", "clear", tripod.rod.getBait());
+                FishDefinition fish = spawnManager.selectFish("river", "clear", tripod.rod.getBait(), tripod.owner);
                 if (fish != null) {
                     System.out.println("[AFK] Tripod at " + pos + " caught " + fish.getName() + "!");
                     levelManager.addXp(tripod.owner, fish.getXpReward() / 2); // 50% XP for AFK

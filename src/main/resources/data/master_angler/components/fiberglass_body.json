@@ -1,0 +1,8 @@
+{
+  "id": "fiberglass_body",
+  "name": "Fiberglass Body",
+  "type": "BODY",
+  "durability": 100.0,
+  "weight": 0.5,
+  "maxWeightCapacity": 10.0
+}

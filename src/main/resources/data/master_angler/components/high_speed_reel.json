@@ -1,0 +1,7 @@
+{
+  "id": "high_speed_reel",
+  "name": "High Speed Reel",
+  "type": "REEL",
+  "reelSpeed": 8.0,
+  "afkEfficiency": 0.5
+}
