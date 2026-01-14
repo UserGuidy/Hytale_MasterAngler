@@ -85,10 +85,17 @@ public class AfkFishingManager {
 
             if (random.nextFloat() < catchChance) {
                 // SUCCESS
-                FishDefinition fish = spawnManager.selectFish("river", "clear", tripod.rod.getBait(), tripod.owner);
+                // AFK Fishing Power assumption: Rod strength + basic reel factor
+                float power = tripod.rod.getLine().getBreakingStrength() + (tripod.rod.getReel().getReelSpeed() * 0.2f);
+
+                FishDefinition fish = spawnManager.selectFish("river", "clear", tripod.rod.getBait(), tripod.owner, power);
                 if (fish != null) {
-                    System.out.println("[AFK] Tripod at " + pos + " caught " + fish.getName() + "!");
-                    levelManager.addXp(tripod.owner, fish.getXpReward() / 2); // 50% XP for AFK
+                    float weight = spawnManager.generateWeight(fish, power);
+                    float size = spawnManager.generateSize(fish, power);
+                    int xp = spawnManager.calculateXp(fish, weight, size);
+
+                    System.out.println("[AFK] Tripod at " + pos + " caught " + fish.getName() + " (" + weight + "kg)");
+                    levelManager.addXp(tripod.owner, xp / 2); // 50% XP for AFK
 
                     // Decrease durability
                     tripod.rod.getBody().decreaseDurability(1.0f);

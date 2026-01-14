@@ -1,0 +1,7 @@
+{
+  "id": "wooden_crate",
+  "name": "Wooden Crate",
+  "minPowerRequired": 0.0,
+  "rarity": 0.1,
+  "lootTable": ["fiberglass_sheet", "oak_plank", "string", "leather"]
+}

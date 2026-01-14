@@ -45,16 +45,19 @@ public class MasterAnglerPlugin {
         dataLoader.loadComponentDefinitions();
         dataLoader.loadArmorDefinitions();
         dataLoader.loadLootDefinitions();
+        dataLoader.loadCrateDefinitions();
 
         // Initialize Gameplay Managers
         com.masterangler.gear.AnglerArmorManager armorManager = new com.masterangler.gear.AnglerArmorManager();
         armorManager.setDataLoader(dataLoader);
 
         com.masterangler.mechanics.LootTableManager lootManager = new com.masterangler.mechanics.LootTableManager(dataLoader);
+        com.masterangler.mechanics.CrateLootManager crateManager = new com.masterangler.mechanics.CrateLootManager(dataLoader);
 
         com.masterangler.mechanics.FishSpawnManager spawnManager = new com.masterangler.mechanics.FishSpawnManager(dataLoader);
         spawnManager.setArmorManager(armorManager); // Connect Armor to Spawning
         spawnManager.setLootManager(lootManager);
+        spawnManager.setCrateManager(crateManager);
 
         com.masterangler.data.PersistenceManager persistenceManager = new com.masterangler.data.PersistenceManager();
         this.afkManager = new com.masterangler.mechanics.AfkFishingManager(spawnManager, levelManager);
@@ -75,6 +78,7 @@ public class MasterAnglerPlugin {
 
         // Update Event Handler with shared Workbench Manager
         eventHandler.setWorkbenchManager(workbenchManager);
+        eventHandler.setArmorManager(armorManager);
 
         // Initialize Commands
         com.masterangler.commands.CommandManager commandManager = new com.masterangler.commands.CommandManager(

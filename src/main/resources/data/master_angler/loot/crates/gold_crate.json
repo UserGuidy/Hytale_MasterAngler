@@ -1,0 +1,7 @@
+{
+  "id": "gold_crate",
+  "name": "Gold Crate",
+  "minPowerRequired": 20.0,
+  "rarity": 0.02,
+  "lootTable": ["gold_ingot", "titanium_ingot", "carbon_fiber_mesh", "ceramic_parts"]
+}

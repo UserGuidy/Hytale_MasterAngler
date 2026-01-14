@@ -5,6 +5,7 @@ import com.masterangler.gear.FishingWorkbenchManager;
 import com.masterangler.mechanics.FishingSession;
 import com.masterangler.mechanics.FishingSessionManager;
 import com.masterangler.mechanics.TensionManager;
+import com.masterangler.mechanics.FishingPowerCalculator;
 import com.masterangler.mock.ServerContext;
 import com.masterangler.mock.events.PlayerInteractEvent;
 import com.masterangler.mock.events.PlayerMouseButtonEvent;
@@ -20,6 +21,7 @@ public class FishingEventHandler {
     private FishingWorkbenchManager workbenchManager;
     private com.masterangler.mechanics.FishSpawnManager spawnManager;
     private com.masterangler.mechanics.AfkFishingManager afkManager;
+    private com.masterangler.gear.AnglerArmorManager armorManager; // Needed for power calc
 
     public FishingEventHandler(FishingSessionManager sessionManager,
                                TensionManager tensionManager,
@@ -48,6 +50,10 @@ public class FishingEventHandler {
         this.afkManager = afkManager;
     }
 
+    public void setArmorManager(com.masterangler.gear.AnglerArmorManager armorManager) {
+        this.armorManager = armorManager;
+    }
+
     // Launch Fishing
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getItem() != null && event.getItem().getItem().hasTag("fishing_rod")) {
@@ -66,13 +72,17 @@ public class FishingEventHandler {
                 FishingSession session = sessionManager.getSession(event.getPlayer());
 
                 if (spawnManager != null) {
+                    // Calculate Fishing Power
+                    float power = FishingPowerCalculator.calculateFishingPower(rod, event.getPlayer(), armorManager);
+
                     // Mock environment
-                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), event.getPlayer());
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), event.getPlayer(), power);
+
                     if (fishDef != null) {
-                        float weight = spawnManager.generateWeight(fishDef);
-                        float size = spawnManager.generateSize(fishDef);
+                        float weight = spawnManager.generateWeight(fishDef, power);
+                        float size = spawnManager.generateSize(fishDef, power);
                         session.hookFish(fishDef, weight, size);
-                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg, " + size + "cm)");
+                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg, " + size + "cm) [Power: " + power + "]");
                     } else {
                         System.out.println("No fish bit.");
                     }
@@ -138,9 +148,13 @@ public class FishingEventHandler {
              } else if (newProgress >= 1.0f) {
                  // WIN CONDITION
                  com.masterangler.data.FishDefinition fish = session.getHookedFish();
-                 System.out.println("CAUGHT FISH: " + fish.getName() + " | XP: " + fish.getXpReward());
 
-                 levelManager.addXp(event.getPlayer(), fish.getXpReward());
+                 // Calculate scaled XP
+                 int xp = spawnManager.calculateXp(fish, session.getHookedFishWeight(), session.getHookedFishSize());
+
+                 System.out.println("CAUGHT FISH: " + fish.getName() + " | XP: " + xp);
+
+                 levelManager.addXp(event.getPlayer(), xp);
 
                  // Standard durability loss
                  session.getRod().getBody().decreaseDurability(1.0f);

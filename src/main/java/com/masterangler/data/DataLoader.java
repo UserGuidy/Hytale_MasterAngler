@@ -22,6 +22,7 @@ public class DataLoader {
     private Map<String, RodComponentDefinition> componentRegistry = new HashMap<>();
     private Map<String, com.masterangler.gear.AnglerArmor> armorRegistry = new HashMap<>();
     private Map<String, LootDefinition> lootRegistry = new HashMap<>();
+    private Map<String, CrateDefinition> crateRegistry = new HashMap<>();
 
     public void loadFishDefinitions() {
         loadData("src/main/resources/data/master_angler/fish", FishDefinition.class, fishRegistry);
@@ -41,6 +42,10 @@ public class DataLoader {
 
     public void loadLootDefinitions() {
         loadData("src/main/resources/data/master_angler/loot", LootDefinition.class, lootRegistry);
+    }
+
+    public void loadCrateDefinitions() {
+        loadData("src/main/resources/data/master_angler/loot/crates", CrateDefinition.class, crateRegistry);
     }
 
     private <T> void loadData(String pathStr, Class<T> clazz, Map<String, T> registry) {
@@ -70,6 +75,7 @@ public class DataLoader {
             if (item instanceof FishDefinition) name = ((FishDefinition) item).getName();
             if (item instanceof RodComponentDefinition) name = ((RodComponentDefinition) item).getId();
             if (item instanceof LootDefinition) name = ((LootDefinition) item).getId();
+            if (item instanceof CrateDefinition) name = ((CrateDefinition) item).getId();
             if (item instanceof com.masterangler.gear.AnglerArmor) {
                 // Use filename as ID since AnglerArmor doesn't have an ID field yet
                 String filename = path.getFileName().toString();
@@ -104,5 +110,9 @@ public class DataLoader {
 
     public List<LootDefinition> getAllLoot() {
         return new ArrayList<>(lootRegistry.values());
+    }
+
+    public List<CrateDefinition> getAllCrates() {
+        return new ArrayList<>(crateRegistry.values());
     }
 }
