@@ -1,4 +1,7 @@
 {
+  "id": "standard_line",
+  "name": "Standard Line",
+  "type": "LINE",
   "maxTension": 10.0,
   "flexibility": 0.5,
   "breakingStrength": 5.0

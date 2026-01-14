@@ -1,0 +1,12 @@
+{
+  "name": "Grouper",
+  "minWeight": 10.0,
+  "maxWeight": 100.0,
+  "minSize": 50.0,
+  "maxSize": 200.0,
+  "fishStrength": 18.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 250,
+  "preferredBaits": ["squid_strip", "cut_bait"]
+}

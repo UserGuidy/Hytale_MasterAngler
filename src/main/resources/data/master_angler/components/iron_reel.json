@@ -1,0 +1,8 @@
+{
+  "id": "iron_reel",
+  "name": "Iron Reel",
+  "type": "REEL",
+  "color": "#A9A9A9",
+  "reelSpeed": 6.0,
+  "afkEfficiency": 0.4
+}

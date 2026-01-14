@@ -1,0 +1,10 @@
+{
+  "id": "thorium_body",
+  "name": "Thorium Body",
+  "type": "BODY",
+  "color": "#40E0D0",
+  "fishingPower": 20.0,
+  "durability": 300.0,
+  "weight": 1.0,
+  "maxWeightCapacity": 40.0
+}

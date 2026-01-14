@@ -1,0 +1,12 @@
+{
+  "name": "Herring",
+  "minWeight": 0.05,
+  "maxWeight": 0.3,
+  "minSize": 10.0,
+  "maxSize": 30.0,
+  "fishStrength": 1.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.0,
+  "xpReward": 10,
+  "preferredBaits": ["bread_bait", "worm_bait"]
+}

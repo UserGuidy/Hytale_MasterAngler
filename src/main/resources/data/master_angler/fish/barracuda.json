@@ -1,0 +1,12 @@
+{
+  "name": "Barracuda",
+  "minWeight": 2.0,
+  "maxWeight": 10.0,
+  "minSize": 60.0,
+  "maxSize": 150.0,
+  "fishStrength": 12.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 1.1,
+  "xpReward": 120,
+  "preferredBaits": ["cut_bait", "frog_lure"]
+}

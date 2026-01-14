@@ -1,0 +1,10 @@
+{
+  "id": "wooden_body",
+  "name": "Wooden Rod Body",
+  "type": "BODY",
+  "color": "#8B4513",
+  "fishingPower": 2.0,
+  "durability": 50.0,
+  "weight": 0.8,
+  "maxWeightCapacity": 5.0
+}

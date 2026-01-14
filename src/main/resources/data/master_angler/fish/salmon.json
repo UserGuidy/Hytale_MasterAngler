@@ -1,0 +1,12 @@
+{
+  "name": "Salmon",
+  "minWeight": 3.0,
+  "maxWeight": 15.0,
+  "minSize": 40.0,
+  "maxSize": 100.0,
+  "fishStrength": 10.0,
+  "biomeID": "river",
+  "weatherMultiplier": 1.2,
+  "xpReward": 90,
+  "preferredBaits": ["fly_bait", "cut_bait"]
+}

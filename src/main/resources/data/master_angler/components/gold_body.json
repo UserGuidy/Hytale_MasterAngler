@@ -1,0 +1,10 @@
+{
+  "id": "gold_body",
+  "name": "Gilded Body",
+  "type": "BODY",
+  "color": "#FFD700",
+  "fishingPower": 12.0,
+  "durability": 80.0,
+  "weight": 2.0,
+  "maxWeightCapacity": 12.0
+}

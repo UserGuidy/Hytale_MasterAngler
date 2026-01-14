@@ -84,7 +84,8 @@ public class FishingEventHandler {
                         session.hookFish(fishDef, weight, size);
                         System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg, " + size + "cm) [Power: " + power + "]");
                     } else {
-                        System.out.println("No fish bit.");
+                        System.out.println("No fish bit (or Crate caught instantly).");
+                        sessionManager.endSession(event.getPlayer()); // Prevent soft-lock
                     }
                 }
             }
