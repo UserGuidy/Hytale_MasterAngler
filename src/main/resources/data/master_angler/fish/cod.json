@@ -1,0 +1,12 @@
+{
+  "name": "Atlantic Cod",
+  "minWeight": 2.0,
+  "maxWeight": 10.0,
+  "minSize": 40.0,
+  "maxSize": 100.0,
+  "fishStrength": 4.0,
+  "biomeID": "ocean",
+  "weatherMultiplier": 0.8,
+  "xpReward": 45,
+  "preferredBaits": ["cut_bait", "squid_strip"]
+}

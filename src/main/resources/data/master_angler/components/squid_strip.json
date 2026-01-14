@@ -1,0 +1,7 @@
+{
+  "id": "squid_strip",
+  "name": "Squid Strip",
+  "type": "BAIT",
+  "attractivity": 1.6,
+  "catchRate": 1.25
+}

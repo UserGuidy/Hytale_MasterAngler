@@ -10,6 +10,7 @@ public class FishDefinition {
     private String biomeID;
     private float weatherMultiplier; // 1.0 default
     private int xpReward;
+    private java.util.List<String> preferredBaits; // List of bait IDs
 
     public String getName() { return name; }
     public float getMinWeight() { return minWeight; }
@@ -20,4 +21,8 @@ public class FishDefinition {
     public String getBiomeID() { return biomeID; }
     public float getWeatherMultiplier() { return weatherMultiplier; }
     public int getXpReward() { return xpReward; }
+
+    public java.util.List<String> getPreferredBaits() {
+        return preferredBaits != null ? preferredBaits : new java.util.ArrayList<>();
+    }
 }

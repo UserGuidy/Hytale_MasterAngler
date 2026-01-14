@@ -1,0 +1,12 @@
+{
+  "name": "Northern Pike",
+  "minWeight": 3.0,
+  "maxWeight": 12.0,
+  "minSize": 50.0,
+  "maxSize": 100.0,
+  "fishStrength": 7.0,
+  "biomeID": "swamp",
+  "weatherMultiplier": 1.1,
+  "xpReward": 70,
+  "preferredBaits": ["frog_lure", "cut_bait"]
+}

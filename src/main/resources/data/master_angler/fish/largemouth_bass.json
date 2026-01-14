@@ -1,0 +1,12 @@
+{
+  "name": "Largemouth Bass",
+  "minWeight": 1.0,
+  "maxWeight": 5.0,
+  "minSize": 25.0,
+  "maxSize": 60.0,
+  "fishStrength": 5.0,
+  "biomeID": "river",
+  "weatherMultiplier": 1.0,
+  "xpReward": 50,
+  "preferredBaits": ["frog_lure", "worm_bait"]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Catfish",
+  "minWeight": 3.0,
+  "maxWeight": 20.0,
+  "minSize": 40.0,
+  "maxSize": 120.0,
+  "fishStrength": 8.0,
+  "biomeID": "river",
+  "weatherMultiplier": 1.0,
+  "xpReward": 80,
+  "preferredBaits": ["cut_bait", "worm_bait"]
+}

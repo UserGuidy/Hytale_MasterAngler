@@ -1,0 +1,12 @@
+{
+  "name": "Common Carp",
+  "minWeight": 2.0,
+  "maxWeight": 15.0,
+  "minSize": 30.0,
+  "maxSize": 90.0,
+  "fishStrength": 6.0,
+  "biomeID": "river",
+  "weatherMultiplier": 0.9,
+  "xpReward": 60,
+  "preferredBaits": ["corn_bait", "bread_bait"]
+}

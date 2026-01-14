@@ -1,0 +1,7 @@
+{
+  "id": "cut_bait",
+  "name": "Cut Bait",
+  "type": "BAIT",
+  "attractivity": 1.4,
+  "catchRate": 1.2
+}

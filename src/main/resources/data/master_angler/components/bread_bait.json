@@ -1,0 +1,7 @@
+{
+  "id": "bread_bait",
+  "name": "Bread Crumb",
+  "type": "BAIT",
+  "attractivity": 1.0,
+  "catchRate": 1.0
+}

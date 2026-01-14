@@ -2,6 +2,6 @@
   "id": "worm_bait",
   "name": "Worm",
   "type": "BAIT",
-  "attractivity": 1.5,
-  "catchRate": 1.2
+  "attractivity": 1.2,
+  "catchRate": 1.1
 }

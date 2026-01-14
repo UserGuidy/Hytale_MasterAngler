@@ -51,16 +51,7 @@ public class FishSpawnManager {
             luckBonus = armorManager.getTotalLuckBonus(player);
         }
 
-        // Simple Luck Logic: Chance to reroll if result is "common" (not implemented here as rarity isn't in definition yet)
-        // Or simple multiplier to "catch rate".
-        // Here we just print it to verify logic is connected.
-        if (luckBonus > 0) {
-            System.out.println("Player has " + luckBonus + " luck bonus!");
-        }
-
-        // Treasure Check (Mocking return type as FishDefinition for now, ideally we return a CatchResult wrapper)
-        // For Phase 4, we just log the treasure if rolled, but return a fish so gameplay loop continues.
-        // To properly implement, FishingSession would need to handle "Non-Fish" catches.
+        // Treasure Check
         if (lootManager != null) {
             com.masterangler.data.LootDefinition loot = lootManager.rollForTreasure(luckBonus);
             if (loot != null) {
@@ -69,6 +60,18 @@ public class FishSpawnManager {
             }
         }
 
+        // Bait Preference Logic
+        // Filter list to prioritize fish that like this bait
+        List<FishDefinition> preferredFish = availableFish.stream()
+                .filter(f -> f.getPreferredBaits().contains(bait.getId()))
+                .collect(Collectors.toList());
+
+        // If we have fish that like this bait, heavily favor them (e.g. 80% chance)
+        if (!preferredFish.isEmpty() && random.nextFloat() < 0.8f) {
+            return preferredFish.get(random.nextInt(preferredFish.size()));
+        }
+
+        // Fallback to random available fish (low chance if bait is wrong)
         return availableFish.get(random.nextInt(availableFish.size()));
     }
 

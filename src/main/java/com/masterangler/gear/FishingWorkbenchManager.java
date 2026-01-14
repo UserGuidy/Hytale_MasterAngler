@@ -68,7 +68,7 @@ public class FishingWorkbenchManager {
             case BODY: return new RodBody(def.getDurability(), def.getWeight(), def.getMaxWeightCapacity(), def.getColor());
             case LINE: return new RodLine(def.getMaxTension(), def.getFlexibility(), def.getBreakingStrength());
             case REEL: return new RodReel(def.getReelSpeed(), def.getAfkEfficiency(), def.getColor());
-            case BAIT: return new RodBait(def.getAttractivity(), def.getCatchRate());
+            case BAIT: return new RodBait(def.getId(), def.getAttractivity(), def.getCatchRate());
             default: return null;
         }
     }
