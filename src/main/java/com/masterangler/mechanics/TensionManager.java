@@ -50,12 +50,14 @@ public class TensionManager {
      * @param currentTension The current accumulated tension.
      * @param isLineBroken Whether the line has snapped.
      */
-    public void updateAndSync(com.masterangler.mock.ServerContext context, com.masterangler.mock.Player player, float currentTension, boolean isLineBroken) {
+    public void updateAndSync(com.masterangler.mock.ServerContext context, com.masterangler.mock.Player player, float currentTension, boolean isLineBroken, float catchProgress) {
         // Create the sync packet
         com.masterangler.networking.TensionSyncPacket packet = new com.masterangler.networking.TensionSyncPacket(currentTension, isLineBroken);
-
-        // Send to client
         context.sendPacket(player, packet);
+
+        // Create progress packet
+        com.masterangler.networking.CatchProgressPacket progressPacket = new com.masterangler.networking.CatchProgressPacket(catchProgress);
+        context.sendPacket(player, progressPacket);
     }
 
     /**

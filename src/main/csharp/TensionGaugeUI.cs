@@ -33,5 +33,18 @@ namespace MasterAngler.Client.UI
             // TODO: Show visual effect for broken line
             // Console.WriteLine("[UI] LINE BROKEN!");
         }
+
+        // Catch Progress Packet Listener
+        public void OnProgressPacketReceived(float progress)
+        {
+            // Implementation of client-side prediction logic
+            //
+            // float targetProgress = progress;
+            // float displayProgress = Lerp(currentDisplayProgress, targetProgress, Time.deltaTime * smoothingSpeed);
+            //
+            // UpdateProgressBar(displayProgress);
+
+            // Console.WriteLine($"[UI] Progress update: {progress * 100}%");
+        }
     }
 }

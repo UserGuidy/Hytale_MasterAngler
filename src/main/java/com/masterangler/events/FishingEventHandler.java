@@ -19,6 +19,7 @@ public class FishingEventHandler {
     private ServerContext serverContext;
     private FishingWorkbenchManager workbenchManager;
     private com.masterangler.mechanics.FishSpawnManager spawnManager;
+    private com.masterangler.mechanics.AfkFishingManager afkManager;
 
     public FishingEventHandler(FishingSessionManager sessionManager,
                                TensionManager tensionManager,
@@ -33,6 +34,10 @@ public class FishingEventHandler {
 
     public void setSpawnManager(com.masterangler.mechanics.FishSpawnManager spawnManager) {
         this.spawnManager = spawnManager;
+    }
+
+    public void setAfkManager(com.masterangler.mechanics.AfkFishingManager afkManager) {
+        this.afkManager = afkManager;
     }
 
     // Launch Fishing
@@ -112,10 +117,14 @@ public class FishingEventHandler {
              session.setCatchProgress(newProgress);
 
              // Sync
-             tensionManager.updateAndSync(serverContext, event.getPlayer(), newTension, isBroken);
+             tensionManager.updateAndSync(serverContext, event.getPlayer(), newTension, isBroken, newProgress);
 
              if (isBroken) {
                  System.out.println("Line broken! Fish lost.");
+                 // Reduce durability heavily on break
+                 session.getRod().getBody().decreaseDurability(5.0f);
+                 checkRodDurability(event.getPlayer(), session.getRod());
+
                  sessionManager.endSession(event.getPlayer());
              } else if (newProgress >= 1.0f) {
                  // WIN CONDITION
@@ -124,8 +133,19 @@ public class FishingEventHandler {
 
                  levelManager.addXp(event.getPlayer(), fish.getXpReward());
 
+                 // Standard durability loss
+                 session.getRod().getBody().decreaseDurability(1.0f);
+                 checkRodDurability(event.getPlayer(), session.getRod());
+
                  sessionManager.endSession(event.getPlayer());
              }
+        }
+    }
+
+    private void checkRodDurability(com.masterangler.mock.Player player, DynamicRod rod) {
+        if (rod.getBody().getDurability() <= 0) {
+            System.out.println("ROD BROKEN! " + player.getName() + "'s rod has been destroyed.");
+            // In real logic: Remove item from inventory
         }
     }
 
@@ -133,14 +153,34 @@ public class FishingEventHandler {
     public void onUseBlock(UseBlockEvent event) {
         if (event.getItem() != null && event.getItem().getItem().hasTag("tripod")) {
             int allowedSlots = levelManager.getAfkSlots(event.getPlayer().getLevel());
-            // Mock check for existing tripods (always 0 here so it passes if slots > 0)
-            int currentTripods = 0;
+            // In a real scenario, check activeTripods count from manager for this player
+            // For now, assume player has 0 active, or check simple count logic
 
-            if (currentTripods >= allowedSlots) {
-                event.setCancelled(true);
-                System.out.println("[FishingEventHandler] Tripod placement cancelled. Max slots reached for level " + event.getPlayer().getLevel());
-            } else {
-                System.out.println("[FishingEventHandler] Tripod placed.");
+            if (allowedSlots <= 0) {
+                 event.setCancelled(true);
+                 System.out.println("[FishingEventHandler] Tripod placement cancelled. Level too low.");
+                 return;
+            }
+
+            // Assemble a default rod for the tripod (mock)
+            DynamicRod rod = workbenchManager.assembleRod(
+                 new com.masterangler.gear.RodBody(100f, 1f, 50f),
+                 new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
+                 new com.masterangler.gear.RodReel(5f, 1f),
+                 new com.masterangler.gear.RodBait(1f, 1f)
+            );
+
+            // Use a mock block position based on player location or target block
+            com.masterangler.mock.BlockPosition pos = new com.masterangler.mock.BlockPosition(0, 0, 0); // Mock
+
+            if (afkManager != null) {
+                boolean success = afkManager.registerTripod(event.getPlayer(), pos, rod);
+                if (success) {
+                    System.out.println("[FishingEventHandler] Tripod deployed successfully.");
+                } else {
+                    event.setCancelled(true);
+                    System.out.println("[FishingEventHandler] Tripod placement failed (occupied?).");
+                }
             }
         }
     }

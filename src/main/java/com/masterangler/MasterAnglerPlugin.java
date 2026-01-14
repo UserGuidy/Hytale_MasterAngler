@@ -45,12 +45,31 @@ public class MasterAnglerPlugin {
         // Initialize Gameplay Managers
         com.masterangler.mechanics.FishSpawnManager spawnManager = new com.masterangler.mechanics.FishSpawnManager(dataLoader);
         com.masterangler.data.PersistenceManager persistenceManager = new com.masterangler.data.PersistenceManager();
+        com.masterangler.mechanics.AfkFishingManager afkManager = new com.masterangler.mechanics.AfkFishingManager(spawnManager, levelManager);
 
-        // Update Event Handler with SpawnManager
+        // Update Event Handler with Managers
         eventHandler.setSpawnManager(spawnManager);
+        eventHandler.setAfkManager(afkManager);
 
         // Inject Persistence into Level Manager (Manual wiring for Phase 2)
         levelManager.setPersistenceManager(persistenceManager);
+
+        // Initialize Commands
+        com.masterangler.commands.CommandManager commandManager = new com.masterangler.commands.CommandManager(levelManager);
+        // commandRegistry.register("angler", commandManager); // Mock registration
+
+        // Start AFK Tick Loop (Mock Thread)
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    afkManager.tick();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }).start();
 
         System.out.println("[MasterAnglerPlugin] Systems initialized.");
     }
