@@ -44,8 +44,24 @@ public class AnglerArmorManager {
     public float getTotalLuckBonus(Player player) {
         if (!equippedArmor.containsKey(player)) return 0.0f;
 
-        return (float) equippedArmor.get(player).values().stream()
+        Map<AnglerArmor.ArmorType, AnglerArmor> pieces = equippedArmor.get(player);
+        float total = (float) pieces.values().stream()
                 .mapToDouble(AnglerArmor::getFishingLuckBonus)
                 .sum();
+
+        // Check Set Bonus
+        // Simplification: Check if 4 pieces exist and share same non-null set ID.
+        if (pieces.size() == 4) {
+             String firstSet = pieces.values().iterator().next().getSetId();
+             if (firstSet != null) {
+                 boolean allSame = pieces.values().stream().allMatch(a -> firstSet.equals(a.getSetId()));
+                 if (allSame) {
+                     System.out.println("Set Bonus Active: " + firstSet);
+                     total += 0.5f; // Flat bonus for full set
+                 }
+             }
+        }
+
+        return total;
     }
 }

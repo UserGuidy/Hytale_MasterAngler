@@ -12,10 +12,15 @@ import com.masterangler.gear.AnglerArmorManager;
 public class FishSpawnManager {
     private DataLoader dataLoader;
     private AnglerArmorManager armorManager;
+    private LootTableManager lootManager;
     private Random random = new Random();
 
     public FishSpawnManager(DataLoader dataLoader) {
         this.dataLoader = dataLoader;
+    }
+
+    public void setLootManager(LootTableManager lootManager) {
+        this.lootManager = lootManager;
     }
 
     public void setArmorManager(AnglerArmorManager armorManager) {
@@ -53,11 +58,27 @@ public class FishSpawnManager {
             System.out.println("Player has " + luckBonus + " luck bonus!");
         }
 
+        // Treasure Check (Mocking return type as FishDefinition for now, ideally we return a CatchResult wrapper)
+        // For Phase 4, we just log the treasure if rolled, but return a fish so gameplay loop continues.
+        // To properly implement, FishingSession would need to handle "Non-Fish" catches.
+        if (lootManager != null) {
+            com.masterangler.data.LootDefinition loot = lootManager.rollForTreasure(luckBonus);
+            if (loot != null) {
+                System.out.println("Wait! You feel something heavy... it's a " + loot.getName());
+                // In a full implementation, we would return a special "FishDefinition" representing loot or change method signature.
+            }
+        }
+
         return availableFish.get(random.nextInt(availableFish.size()));
     }
 
     public float generateWeight(FishDefinition fish) {
         float range = fish.getMaxWeight() - fish.getMinWeight();
         return fish.getMinWeight() + (random.nextFloat() * range);
+    }
+
+    public float generateSize(FishDefinition fish) {
+        float range = fish.getMaxSize() - fish.getMinSize();
+        return fish.getMinSize() + (random.nextFloat() * range);
     }
 }

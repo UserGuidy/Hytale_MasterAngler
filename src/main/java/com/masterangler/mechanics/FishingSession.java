@@ -13,6 +13,7 @@ public class FishingSession {
     private boolean isFishHooked = false;
     private com.masterangler.data.FishDefinition hookedFish;
     private float hookedFishWeight = 0.0f;
+    private float hookedFishSize = 0.0f;
 
     // Status flags
     private boolean reeling = false;
@@ -50,10 +51,11 @@ public class FishingSession {
         return isFishHooked;
     }
 
-    public void hookFish(com.masterangler.data.FishDefinition fish, float weight) {
+    public void hookFish(com.masterangler.data.FishDefinition fish, float weight, float size) {
         this.isFishHooked = true;
         this.hookedFish = fish;
         this.hookedFishWeight = weight;
+        this.hookedFishSize = size;
     }
 
     public com.masterangler.data.FishDefinition getHookedFish() {
@@ -62,6 +64,10 @@ public class FishingSession {
 
     public float getHookedFishWeight() {
         return hookedFishWeight;
+    }
+
+    public float getHookedFishSize() {
+        return hookedFishSize;
     }
 
     public float getHookedFishStrength() {

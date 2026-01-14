@@ -21,6 +21,7 @@ public class DataLoader {
     private Map<String, FishDefinition> fishRegistry = new HashMap<>();
     private Map<String, RodComponentDefinition> componentRegistry = new HashMap<>();
     private Map<String, com.masterangler.gear.AnglerArmor> armorRegistry = new HashMap<>();
+    private Map<String, LootDefinition> lootRegistry = new HashMap<>();
 
     public void loadFishDefinitions() {
         loadData("src/main/resources/data/master_angler/fish", FishDefinition.class, fishRegistry);
@@ -36,6 +37,10 @@ public class DataLoader {
         // However, AnglerArmor class matches JSON fields. We need a way to key it.
         // Let's assume the filename is the key for now in loadSingleFile logic tweak or we add ID to AnglerArmor.
         loadData("src/main/resources/data/master_angler/armor", com.masterangler.gear.AnglerArmor.class, armorRegistry);
+    }
+
+    public void loadLootDefinitions() {
+        loadData("src/main/resources/data/master_angler/loot", LootDefinition.class, lootRegistry);
     }
 
     private <T> void loadData(String pathStr, Class<T> clazz, Map<String, T> registry) {
@@ -64,6 +69,7 @@ public class DataLoader {
             String name = null;
             if (item instanceof FishDefinition) name = ((FishDefinition) item).getName();
             if (item instanceof RodComponentDefinition) name = ((RodComponentDefinition) item).getId();
+            if (item instanceof LootDefinition) name = ((LootDefinition) item).getId();
             if (item instanceof com.masterangler.gear.AnglerArmor) {
                 // Use filename as ID since AnglerArmor doesn't have an ID field yet
                 String filename = path.getFileName().toString();
@@ -94,5 +100,9 @@ public class DataLoader {
 
     public Map<String, com.masterangler.gear.AnglerArmor> getAllArmor() {
         return armorRegistry;
+    }
+
+    public List<LootDefinition> getAllLoot() {
+        return new ArrayList<>(lootRegistry.values());
     }
 }

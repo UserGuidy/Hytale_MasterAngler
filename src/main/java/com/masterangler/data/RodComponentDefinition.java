@@ -9,6 +9,9 @@ public class RodComponentDefinition {
     private String name;
     private ComponentType type;
 
+    // Aesthetics
+    private String color; // Hex code or name
+
     // Union of all possible stats (some will be 0/null depending on type)
     private float durability;        // Body
     private float weight;            // Body
@@ -27,6 +30,8 @@ public class RodComponentDefinition {
     public String getId() { return id; }
     public String getName() { return name; }
     public ComponentType getType() { return type; }
+
+    public String getColor() { return color; }
 
     public float getDurability() { return durability; }
     public float getWeight() { return weight; }

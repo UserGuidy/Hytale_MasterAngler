@@ -70,8 +70,9 @@ public class FishingEventHandler {
                     com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), event.getPlayer());
                     if (fishDef != null) {
                         float weight = spawnManager.generateWeight(fishDef);
-                        session.hookFish(fishDef, weight);
-                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg)");
+                        float size = spawnManager.generateSize(fishDef);
+                        session.hookFish(fishDef, weight, size);
+                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg, " + size + "cm)");
                     } else {
                         System.out.println("No fish bit.");
                     }

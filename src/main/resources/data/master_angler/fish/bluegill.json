@@ -2,6 +2,8 @@
   "name": "Bluegill",
   "minWeight": 0.2,
   "maxWeight": 0.8,
+  "minSize": 10.0,
+  "maxSize": 25.0,
   "fishStrength": 2.0,
   "biomeID": "river",
   "weatherMultiplier": 1.0,
