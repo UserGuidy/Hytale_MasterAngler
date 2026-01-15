@@ -78,7 +78,12 @@ public class FishingEventHandler {
 
                 if (spawnManager != null) {
                     float power = FishingPowerCalculator.calculateFishingPower(rod, player, armorManager);
-                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), player, power);
+
+                    String envName = player.getWorld().getName();
+                    String mappedBiome = spawnManager.mapEnvironmentToBiome(envName);
+                    System.out.println("[Master Angler] World Name: " + envName + " -> Mapped Biome: " + mappedBiome);
+
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish(mappedBiome, "clear", rod.getBait(), player, power);
 
                     if (fishDef != null) {
                         float weight = spawnManager.generateWeight(fishDef, power);

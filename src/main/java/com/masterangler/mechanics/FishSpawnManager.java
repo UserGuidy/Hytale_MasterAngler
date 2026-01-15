@@ -129,4 +129,18 @@ public class FishSpawnManager {
         float bonusMultiplier = 1.0f + weightRatio; // Up to 2x XP for max weight
         return (int) (fish.getXpReward() * bonusMultiplier);
     }
+
+    public String mapEnvironmentToBiome(String envName) {
+        if (envName == null) return "river";
+        String lower = envName.toLowerCase();
+
+        if (lower.contains("zone1") || lower.contains("forest")) return "river";
+        if (lower.contains("zone2") || lower.contains("desert")) return "desert";
+        if (lower.contains("zone3") || lower.contains("snow") || lower.contains("ice")) return "cold";
+        if (lower.contains("zone4") || lower.contains("cave") || lower.contains("underground")) return "cave";
+        if (lower.contains("ocean") || lower.contains("beach")) return "ocean";
+
+        // Default fallback
+        return "river";
+    }
 }
