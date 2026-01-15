@@ -18,8 +18,13 @@ public class FishingBobberEntity extends Entity {
     private Vector3d velocity = new Vector3d(0, 0, 0);
     private long spawnTime;
 
+    public FishingBobberEntity() {
+        super();
+        this.spawnTime = System.currentTimeMillis();
+    }
+
     public FishingBobberEntity(World world) {
-        super(world);
+        super(); // Do not register world in super constructor to allow loadIntoWorld
         this.spawnTime = System.currentTimeMillis();
     }
 

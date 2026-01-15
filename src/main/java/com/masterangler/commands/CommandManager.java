@@ -154,7 +154,7 @@ public class CommandManager extends AbstractCommand {
                 FishingSession session = sessionManager.getSession(player);
 
                 // Spawn Bobber
-                FishingBobberEntity bobber = new FishingBobberEntity(player.getWorld());
+                FishingBobberEntity bobber = new FishingBobberEntity();
                 bobber.loadIntoWorld(player.getWorld());
                 session.setBobber(bobber);
 
