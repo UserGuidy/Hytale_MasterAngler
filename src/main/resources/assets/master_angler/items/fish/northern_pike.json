@@ -1,0 +1,6 @@
+{
+  "model": "master_angler:fishing_rod",
+  "name": "Northern Pike",
+  "rarity": "common",
+  "maxStack": 16
+}

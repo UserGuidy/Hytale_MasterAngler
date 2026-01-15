@@ -1,0 +1,6 @@
+{
+  "model": "master_angler:fishing_rod",
+  "name": "Salmon",
+  "rarity": "common",
+  "maxStack": 16
+}

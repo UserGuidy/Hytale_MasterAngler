@@ -1,0 +1,6 @@
+{
+  "model": "master_angler:fishing_rod",
+  "name": "High Speed Reel",
+  "rarity": "common",
+  "maxStack": 64
+}

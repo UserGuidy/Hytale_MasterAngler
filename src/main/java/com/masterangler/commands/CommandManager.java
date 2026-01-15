@@ -74,7 +74,8 @@ public class CommandManager extends AbstractCommand {
                 if (args.length < 2) break;
                 try {
                     int level = Integer.parseInt(args[1]);
-                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Set level to " + level + " (Mock Action)"));
+                    levelManager.setLevel(player, level);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Set fishing level to " + level));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Invalid number"));
                 }
@@ -114,18 +115,24 @@ public class CommandManager extends AbstractCommand {
                 break;
 
             case "rod":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave default rod to " + player.getLegacyDisplayName()));
-                // In real impl: Add item to inventory using player.getInventory().addItem(...)
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave rod components to " + player.getDisplayName()));
+
+                // Give basic components to allow testing crafting.
+                // Using namespaced IDs to ensure Hytale recognizes them from the asset pack.
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:fiberglass_body", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:braided_line", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:high_speed_reel", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:worm_bait", 5));
                 break;
 
             case "workbench":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening mock workbench..."));
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening workbench (Logic Only)..."));
 
                 // Real ItemStacks require defined ItemTypes or IDs
-                ItemStack body = new ItemStack("fiberglass_body");
-                ItemStack line = new ItemStack("braided_line");
-                ItemStack reel = new ItemStack("high_speed_reel");
-                ItemStack bait = new ItemStack("worm_bait");
+                ItemStack body = new ItemStack("master_angler:fiberglass_body");
+                ItemStack line = new ItemStack("master_angler:braided_line");
+                ItemStack reel = new ItemStack("master_angler:high_speed_reel");
+                ItemStack bait = new ItemStack("master_angler:worm_bait");
 
                 workbenchManager.validateAndCraft(body, line, reel, bait);
                 break;
