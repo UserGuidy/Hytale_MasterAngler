@@ -53,6 +53,10 @@ public class FishingEventHandler {
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItemInHand();
 
+        if (itemStack != null && !itemStack.isEmpty()) {
+            System.out.println("[Master Angler] Interact with item: " + itemStack.getItemId());
+        }
+
         if (itemStack != null && !itemStack.isEmpty() && ("master_angler:fishing_rod".equals(itemStack.getItemId()) || "fishing_rod".equals(itemStack.getItemId()))) {
              // Mocking a rod assembly for the session
              DynamicRod rod = workbenchManager.assembleRod(
