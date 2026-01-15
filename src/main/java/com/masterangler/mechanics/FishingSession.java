@@ -1,9 +1,7 @@
 package com.masterangler.mechanics;
 
 import com.masterangler.gear.DynamicRod;
-import com.masterangler.mock.Player;
-// In a real implementation, Fish would be a class
-import com.masterangler.mock.BaseEntity;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 public class FishingSession {
     private Player player;

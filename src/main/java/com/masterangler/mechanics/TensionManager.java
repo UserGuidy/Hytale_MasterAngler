@@ -1,5 +1,8 @@
 package com.masterangler.mechanics;
 
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.protocol.Packet;
+
 public class TensionManager {
 
     /**
@@ -45,19 +48,30 @@ public class TensionManager {
     /**
      * Updates the tension state and syncs with the client.
      *
-     * @param context The server context to send packets.
      * @param player The player involved in the fishing event.
      * @param currentTension The current accumulated tension.
      * @param isLineBroken Whether the line has snapped.
      */
-    public void updateAndSync(com.masterangler.mock.ServerContext context, com.masterangler.mock.Player player, float currentTension, boolean isLineBroken, float catchProgress) {
+    public void updateAndSync(Player player, float currentTension, boolean isLineBroken, float catchProgress) {
         // Create the sync packet
         com.masterangler.networking.TensionSyncPacket packet = new com.masterangler.networking.TensionSyncPacket(currentTension, isLineBroken);
-        context.sendPacket(player, packet);
 
-        // Create progress packet
-        com.masterangler.networking.CatchProgressPacket progressPacket = new com.masterangler.networking.CatchProgressPacket(catchProgress);
-        context.sendPacket(player, progressPacket);
+        // Use Universe to access PlayerRef for networking
+        try {
+            com.hypixel.hytale.server.core.universe.PlayerRef ref = com.hypixel.hytale.server.core.universe.Universe.get().getPlayer(player.getUuid());
+            if (ref != null) {
+                // Using write(Packet) as discovered in PacketHandler
+                ref.getPacketHandler().write((Packet)packet);
+            }
+
+            // Create progress packet
+            com.masterangler.networking.CatchProgressPacket progressPacket = new com.masterangler.networking.CatchProgressPacket(catchProgress);
+            if (ref != null) {
+                ref.getPacketHandler().write((Packet)progressPacket);
+            }
+        } catch (Exception e) {
+             System.out.println("Failed to sync tension packet: " + e.getMessage());
+        }
     }
 
     /**

@@ -1,8 +1,9 @@
 package com.masterangler.networking;
 
-import com.masterangler.mock.Packet;
+import com.hypixel.hytale.protocol.Packet;
+import io.netty.buffer.ByteBuf;
 
-public class TensionSyncPacket extends Packet {
+public class TensionSyncPacket implements Packet {
     private float tension;
     private boolean isLineBroken;
 
@@ -17,5 +18,21 @@ public class TensionSyncPacket extends Packet {
 
     public boolean isLineBroken() {
         return isLineBroken;
+    }
+
+    @Override
+    public int getId() {
+        return 42002;
+    }
+
+    @Override
+    public int computeSize() {
+        return 5; // float (4) + boolean (1)
+    }
+
+    @Override
+    public void serialize(ByteBuf buf) {
+        buf.writeFloat(tension);
+        buf.writeBoolean(isLineBroken);
     }
 }

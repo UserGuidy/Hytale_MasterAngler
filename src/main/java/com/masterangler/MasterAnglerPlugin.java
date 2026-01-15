@@ -1,46 +1,49 @@
 package com.masterangler;
 
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.masterangler.mechanics.AfkFishingManager;
+import com.masterangler.mechanics.FishingSessionManager;
+import com.masterangler.mechanics.TensionManager;
+import com.masterangler.progression.FishingPlayerLevelManager;
+import com.masterangler.events.FishingEventHandler;
+import com.masterangler.data.DataLoader;
+import com.masterangler.data.PersistenceManager;
+import com.masterangler.gear.AnglerArmorManager;
+import com.masterangler.gear.FishingWorkbenchManager;
+import com.masterangler.mechanics.LootTableManager;
+import com.masterangler.mechanics.CrateLootManager;
+import com.masterangler.mechanics.FishSpawnManager;
+import com.masterangler.mechanics.RepairManager;
+import com.masterangler.commands.CommandManager;
+
 /**
  * Main plugin class for Hytale Master Angler.
  *
  * @author Jules
  * @version 1.0.0
  */
-public class MasterAnglerPlugin {
+public class MasterAnglerPlugin extends JavaPlugin {
 
     private static MasterAnglerPlugin instance;
-    private com.masterangler.mechanics.AfkFishingManager afkManager;
+    private AfkFishingManager afkManager;
 
-    /**
-     * Constructor - Called when plugin is loaded.
-     */
-    public MasterAnglerPlugin() {
+    public MasterAnglerPlugin(JavaPluginInit init) {
+        super(init);
         instance = this;
-        System.out.println("[MasterAnglerPlugin] Plugin loaded!");
     }
 
-    /**
-     * Called when plugin is enabled.
-     */
-    public void onEnable() {
+    @Override
+    public void start() {
         System.out.println("[MasterAnglerPlugin] Plugin enabled!");
 
-        // Initialize managers
-        com.masterangler.mock.ServerContext serverContext = new com.masterangler.mock.ServerContext();
-        com.masterangler.mechanics.FishingSessionManager sessionManager = new com.masterangler.mechanics.FishingSessionManager();
-        com.masterangler.mechanics.TensionManager tensionManager = new com.masterangler.mechanics.TensionManager();
-        com.masterangler.progression.FishingPlayerLevelManager levelManager = new com.masterangler.progression.FishingPlayerLevelManager();
-
-        // Register Event Handler
-        com.masterangler.events.FishingEventHandler eventHandler = new com.masterangler.events.FishingEventHandler(
-            sessionManager, tensionManager, levelManager, serverContext
-        );
-
-        com.masterangler.mock.EventBus eventBus = new com.masterangler.mock.EventBus();
-        eventBus.register(eventHandler);
+        // Initialize Managers
+        FishingSessionManager sessionManager = new FishingSessionManager();
+        TensionManager tensionManager = new TensionManager();
+        FishingPlayerLevelManager levelManager = new FishingPlayerLevelManager();
 
         // Initialize Data
-        com.masterangler.data.DataLoader dataLoader = new com.masterangler.data.DataLoader();
+        DataLoader dataLoader = new DataLoader();
         dataLoader.loadFishDefinitions();
         dataLoader.loadComponentDefinitions();
         dataLoader.loadArmorDefinitions();
@@ -48,66 +51,63 @@ public class MasterAnglerPlugin {
         dataLoader.loadCrateDefinitions();
 
         // Initialize Gameplay Managers
-        com.masterangler.gear.AnglerArmorManager armorManager = new com.masterangler.gear.AnglerArmorManager();
+        AnglerArmorManager armorManager = new AnglerArmorManager();
         armorManager.setDataLoader(dataLoader);
 
-        com.masterangler.mechanics.LootTableManager lootManager = new com.masterangler.mechanics.LootTableManager(dataLoader);
-        com.masterangler.mechanics.CrateLootManager crateManager = new com.masterangler.mechanics.CrateLootManager(dataLoader);
+        LootTableManager lootManager = new LootTableManager(dataLoader);
+        CrateLootManager crateManager = new CrateLootManager(dataLoader);
 
-        com.masterangler.mechanics.FishSpawnManager spawnManager = new com.masterangler.mechanics.FishSpawnManager(dataLoader);
-        spawnManager.setArmorManager(armorManager); // Connect Armor to Spawning
+        FishSpawnManager spawnManager = new FishSpawnManager(dataLoader);
+        spawnManager.setArmorManager(armorManager);
         spawnManager.setLootManager(lootManager);
         spawnManager.setCrateManager(crateManager);
 
-        com.masterangler.data.PersistenceManager persistenceManager = new com.masterangler.data.PersistenceManager();
-        this.afkManager = new com.masterangler.mechanics.AfkFishingManager(spawnManager, levelManager);
+        PersistenceManager persistenceManager = new PersistenceManager();
+        persistenceManager.setBaseDir(getDataDirectory());
 
-        // Repair Manager
-        com.masterangler.mechanics.RepairManager repairManager = new com.masterangler.mechanics.RepairManager();
+        this.afkManager = new AfkFishingManager(spawnManager, levelManager);
 
-        // Update Event Handler with Managers
-        eventHandler.setSpawnManager(spawnManager);
-        eventHandler.setAfkManager(afkManager);
-
-        // Inject Persistence into Level Manager (Manual wiring for Phase 2)
-        levelManager.setPersistenceManager(persistenceManager);
-
-        // Inject DataLoader into Workbench
-        com.masterangler.gear.FishingWorkbenchManager workbenchManager = new com.masterangler.gear.FishingWorkbenchManager();
+        RepairManager repairManager = new RepairManager();
+        FishingWorkbenchManager workbenchManager = new FishingWorkbenchManager();
         workbenchManager.setDataLoader(dataLoader);
 
-        // Update Event Handler with shared Workbench Manager
+        levelManager.setPersistenceManager(persistenceManager);
+
+        // Register Event Handler
+        FishingEventHandler eventHandler = new FishingEventHandler(
+            sessionManager, tensionManager, levelManager
+        );
+        eventHandler.setSpawnManager(spawnManager);
+        eventHandler.setAfkManager(afkManager);
         eventHandler.setWorkbenchManager(workbenchManager);
         eventHandler.setArmorManager(armorManager);
 
+        // Trying registerGlobal for generic event handling logic based on error hint
+        // Note: If PlayerInteractEvent is keyed, we might need a specific key, but "Global" usually covers all keys.
+        getEventRegistry().registerGlobal(com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent.class, eventHandler::onPlayerInteract);
+
         // Initialize Commands
-        com.masterangler.commands.CommandManager commandManager = new com.masterangler.commands.CommandManager(
+        CommandManager commandManager = new CommandManager(
             levelManager,
             workbenchManager,
             repairManager,
             armorManager
         );
-        // commandRegistry.register("angler", commandManager); // Mock registration
+        getCommandRegistry().registerCommand(commandManager);
 
-        // Start AFK Tick Loop (Mock Thread)
-        new Thread(() -> {
-            while (afkManager.isRunning()) {
-                try {
-                    Thread.sleep(1000);
-                    afkManager.tick();
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        }).start();
+        // Start AFK Tick Loop
+        // Using Hytale Scheduler instead of raw thread
+        com.hypixel.hytale.server.core.HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> {
+             if (afkManager.isRunning()) {
+                 afkManager.tick();
+             }
+        }, 0, 1, java.util.concurrent.TimeUnit.SECONDS);
 
         System.out.println("[MasterAnglerPlugin] Systems initialized.");
     }
 
-    /**
-     * Called when plugin is disabled.
-     */
-    public void onDisable() {
+    @Override
+    public void shutdown() {
         System.out.println("[MasterAnglerPlugin] Plugin disabled!");
 
         if (afkManager != null) {
@@ -115,9 +115,6 @@ public class MasterAnglerPlugin {
         }
     }
 
-    /**
-     * Get plugin instance.
-     */
     public static MasterAnglerPlugin getInstance() {
         return instance;
     }

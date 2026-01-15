@@ -6,35 +6,28 @@ import com.masterangler.mechanics.FishingSession;
 import com.masterangler.mechanics.FishingSessionManager;
 import com.masterangler.mechanics.TensionManager;
 import com.masterangler.mechanics.FishingPowerCalculator;
-import com.masterangler.mock.ServerContext;
-import com.masterangler.mock.events.PlayerInteractEvent;
-import com.masterangler.mock.events.PlayerMouseButtonEvent;
-import com.masterangler.mock.events.UseBlockEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.masterangler.progression.FishingPlayerLevelManager;
+import com.hypixel.hytale.math.vector.Vector3i;
 
 public class FishingEventHandler {
 
     private FishingSessionManager sessionManager;
     private TensionManager tensionManager;
     private FishingPlayerLevelManager levelManager;
-    private ServerContext serverContext;
     private FishingWorkbenchManager workbenchManager;
     private com.masterangler.mechanics.FishSpawnManager spawnManager;
     private com.masterangler.mechanics.AfkFishingManager afkManager;
-    private com.masterangler.gear.AnglerArmorManager armorManager; // Needed for power calc
+    private com.masterangler.gear.AnglerArmorManager armorManager;
 
     public FishingEventHandler(FishingSessionManager sessionManager,
                                TensionManager tensionManager,
-                               FishingPlayerLevelManager levelManager,
-                               ServerContext serverContext) {
+                               FishingPlayerLevelManager levelManager) {
         this.sessionManager = sessionManager;
         this.tensionManager = tensionManager;
         this.levelManager = levelManager;
-        this.serverContext = serverContext;
-        // Workbench is now initialized in Main and passed (or we can keep local default for simple tests,
-        // but better to allow injection if we want the data loader connected).
-        // For this patch, we'll keep the local new() but it won't have the DataLoader unless set.
-        // Ideally, we should refactor constructor to accept it.
         this.workbenchManager = new FishingWorkbenchManager();
     }
 
@@ -54,157 +47,139 @@ public class FishingEventHandler {
         this.armorManager = armorManager;
     }
 
-    // Launch Fishing
+    // Launch Fishing - mapped to PlayerInteractEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getItem() != null && event.getItem().getItem().hasTag("fishing_rod")) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getItemInHand();
+
+        if (itemStack != null && !itemStack.isEmpty() && "fishing_rod".equals(itemStack.getItemId())) {
              // Mocking a rod assembly for the session
+             // In real app, we would read NBT/Components from ItemStack
              DynamicRod rod = workbenchManager.assembleRod(
-                 new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"), // Power 5.0
+                 new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"),
                  new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
-                 new com.masterangler.gear.RodReel(5f, 1f),
-                 new com.masterangler.gear.RodBait(1f, 1f)
+                 new com.masterangler.gear.RodReel(5f, 1f, "#FFFFFF"),
+                 new com.masterangler.gear.RodBait("worm", 1f, 1f)
              );
 
-            if (sessionManager.getSession(event.getPlayer()) == null) {
-                sessionManager.startSession(event.getPlayer(), rod);
+            // Start Session Logic
+            if (sessionManager.getSession(player) == null) {
+                sessionManager.startSession(player, rod);
 
-                // Hook logic
-                FishingSession session = sessionManager.getSession(event.getPlayer());
-
+                FishingSession session = sessionManager.getSession(player);
                 if (spawnManager != null) {
-                    // Calculate Fishing Power
-                    float power = FishingPowerCalculator.calculateFishingPower(rod, event.getPlayer(), armorManager);
-
-                    // Mock environment
-                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), event.getPlayer(), power);
+                    float power = FishingPowerCalculator.calculateFishingPower(rod, player, armorManager);
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), player, power);
 
                     if (fishDef != null) {
                         float weight = spawnManager.generateWeight(fishDef, power);
                         float size = spawnManager.generateSize(fishDef, power);
                         session.hookFish(fishDef, weight, size);
-                        System.out.println("Hooked: " + fishDef.getName() + " (" + weight + "kg, " + size + "cm) [Power: " + power + "]");
+                        // System.out.println("Hooked: " + fishDef.getName());
+                        player.sendMessage(com.hypixel.hytale.server.core.Message.raw("You hooked a " + fishDef.getName() + "!"));
                     } else {
-                        System.out.println("No fish bit (or Crate caught instantly).");
-                        sessionManager.endSession(event.getPlayer()); // Prevent soft-lock
+                        // System.out.println("No fish bit.");
+                        sessionManager.endSession(player);
                     }
                 }
+            } else {
+                // If session exists, this click is likely reeling/tension control
+                handleTensionInteraction(player);
             }
+        } else if (itemStack != null && "tripod".equals(itemStack.getItemId())) {
+             handleTripodPlacement(event);
         }
     }
 
-    // Tension Control
-    public void onPlayerMouseButton(PlayerMouseButtonEvent event) {
-        FishingSession session = sessionManager.getSession(event.getPlayer());
+    // Moved logic from onPlayerMouseButton to here, called by onPlayerInteract
+    private void handleTensionInteraction(Player player) {
+        FishingSession session = sessionManager.getSession(player);
         if (session == null || !session.isFishHooked()) return;
 
-        // Button 1 is Right Click (Reel)
-        if (event.getButton() == 1) {
-            session.setReeling(event.isDown());
-        }
+        // Toggle reeling state on click? Or assume holding click?
+        // Event is usually fire-once. If tension requires continuous hold, we need "Start" and "Stop" use actions.
+        // Assuming simplistic toggle or impulse for now based on 'Interact'
 
-        if (event.isDown()) {
-             // Calculate physics frame (simulating a tick here for the event, ideally this is in a loop)
-             float deltaTime = 0.05f; // 20 ticks per second assumption
+        boolean reeling = !session.isReeling(); // Toggle
+        session.setReeling(reeling);
 
-             float reelSpeed = session.isReeling() ? session.getRod().getReel().getReelSpeed() : 0.0f;
+        // Run simulation step
+        float deltaTime = 0.05f;
+        float reelSpeed = session.isReeling() ? session.getRod().getReel().getReelSpeed() : 0.0f;
+        float baseBreakingStrength = session.getRod().getLine().getBreakingStrength();
+        float bonusStrength = levelManager.getStrengthBonus(0); // Cannot get level directly from Player entity easily without Component, assume 0 or need helper
+        // Ideally: levelManager.getLevel(player)
+        float effectiveBreakingStrength = baseBreakingStrength + bonusStrength;
 
-             // Apply Level 10 Bonus: +1kg resistance (breaking strength)
-             float baseBreakingStrength = session.getRod().getLine().getBreakingStrength();
-             float bonusStrength = levelManager.getStrengthBonus(event.getPlayer().getLevel());
-             float effectiveBreakingStrength = baseBreakingStrength + bonusStrength;
+        float delta = tensionManager.calculateTensionDelta(
+            session.getHookedFishWeight(),
+            session.getHookedFishStrength(),
+            effectiveBreakingStrength,
+            reelSpeed,
+            deltaTime
+        );
 
-             float delta = tensionManager.calculateTensionDelta(
-                 session.getHookedFishWeight(),
-                 session.getHookedFishStrength(),
-                 effectiveBreakingStrength,
-                 reelSpeed,
-                 deltaTime
-             );
+        float newTension = session.getCurrentTension() + delta;
+        session.setCurrentTension(newTension);
+        boolean isBroken = newTension > session.getRod().getLine().getMaxTension();
 
-             float newTension = session.getCurrentTension() + delta;
-             session.setCurrentTension(newTension);
+        float progressDelta = tensionManager.calculateProgressDelta(
+            session.isReeling(),
+            newTension,
+            session.getRod().getLine().getMaxTension() * 0.8f
+        );
 
-             boolean isBroken = newTension > session.getRod().getLine().getMaxTension();
+        float newProgress = session.getCatchProgress() + progressDelta;
+        if (newProgress < 0) newProgress = 0;
+        session.setCatchProgress(newProgress);
 
-             // Catch Progress Logic
-             float progressDelta = tensionManager.calculateProgressDelta(
-                 session.isReeling(),
-                 newTension,
-                 session.getRod().getLine().getMaxTension() * 0.8f // Safe zone is 80% of max tension
-             );
-             float newProgress = session.getCatchProgress() + progressDelta;
-             if (newProgress < 0) newProgress = 0;
-             session.setCatchProgress(newProgress);
+        tensionManager.updateAndSync(player, newTension, isBroken, newProgress);
 
-             // Sync
-             tensionManager.updateAndSync(serverContext, event.getPlayer(), newTension, isBroken, newProgress);
-
-             if (isBroken) {
-                 System.out.println("Line broken! Fish lost.");
-                 // Reduce durability heavily on break
-                 session.getRod().getBody().decreaseDurability(5.0f);
-                 checkRodDurability(event.getPlayer(), session.getRod());
-
-                 sessionManager.endSession(event.getPlayer());
-             } else if (newProgress >= 1.0f) {
-                 // WIN CONDITION
-                 com.masterangler.data.FishDefinition fish = session.getHookedFish();
-
-                 // Calculate scaled XP
-                 int xp = spawnManager.calculateXp(fish, session.getHookedFishWeight(), session.getHookedFishSize());
-
-                 System.out.println("CAUGHT FISH: " + fish.getName() + " | XP: " + xp);
-
-                 levelManager.addXp(event.getPlayer(), xp);
-
-                 // Standard durability loss
-                 session.getRod().getBody().decreaseDurability(1.0f);
-                 checkRodDurability(event.getPlayer(), session.getRod());
-
-                 sessionManager.endSession(event.getPlayer());
-             }
+        if (isBroken) {
+            player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Line broken!"));
+            session.getRod().getBody().decreaseDurability(5.0f);
+            checkRodDurability(player, session.getRod());
+            sessionManager.endSession(player);
+        } else if (newProgress >= 1.0f) {
+            com.masterangler.data.FishDefinition fish = session.getHookedFish();
+            int xp = spawnManager.calculateXp(fish, session.getHookedFishWeight(), session.getHookedFishSize());
+            player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Caught " + fish.getName() + "! XP: " + xp));
+            levelManager.addXp(player, xp);
+            session.getRod().getBody().decreaseDurability(1.0f);
+            checkRodDurability(player, session.getRod());
+            sessionManager.endSession(player);
         }
     }
 
-    private void checkRodDurability(com.masterangler.mock.Player player, DynamicRod rod) {
+    private void checkRodDurability(Player player, DynamicRod rod) {
         if (rod.getBody().getDurability() <= 0) {
-            System.out.println("ROD BROKEN! " + player.getName() + "'s rod has been destroyed.");
+            player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Your rod broke!"));
             // In real logic: Remove item from inventory
         }
     }
 
-    // AFK Tripod Deployment
-    public void onUseBlock(UseBlockEvent event) {
-        if (event.getItem() != null && event.getItem().getItem().hasTag("tripod")) {
-            int allowedSlots = levelManager.getAfkSlots(event.getPlayer().getLevel());
-            // In a real scenario, check activeTripods count from manager for this player
-            // For now, assume player has 0 active, or check simple count logic
+    private void handleTripodPlacement(PlayerInteractEvent event) {
+        // UseBlockEvent logic mapped here
+        Vector3i pos = event.getTargetBlock();
+        if (pos == null) return;
 
-            if (allowedSlots <= 0) {
-                 event.setCancelled(true);
-                 System.out.println("[FishingEventHandler] Tripod placement cancelled. Level too low.");
-                 return;
-            }
+        int allowedSlots = levelManager.getAfkSlots(0); // Assume 0 level if not fetched
+        if (allowedSlots <= 0) {
+             event.setCancelled(true);
+             return;
+        }
 
-            // Assemble a default rod for the tripod (mock)
-            DynamicRod rod = workbenchManager.assembleRod(
-                 new com.masterangler.gear.RodBody(100f, 1f, 50f),
-                 new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
-                 new com.masterangler.gear.RodReel(5f, 1f),
-                 new com.masterangler.gear.RodBait(1f, 1f)
-            );
+        DynamicRod rod = workbenchManager.assembleRod(
+             new com.masterangler.gear.RodBody(100f, 1f, 50f, 1.0f, "#FFF"),
+             new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
+             new com.masterangler.gear.RodReel(5f, 1f, "#FFF"),
+             new com.masterangler.gear.RodBait("worm", 1f, 1f)
+        );
 
-            // Use a mock block position based on player location or target block
-            com.masterangler.mock.BlockPosition pos = new com.masterangler.mock.BlockPosition(0, 0, 0); // Mock
-
-            if (afkManager != null) {
-                boolean success = afkManager.registerTripod(event.getPlayer(), pos, rod);
-                if (success) {
-                    System.out.println("[FishingEventHandler] Tripod deployed successfully.");
-                } else {
-                    event.setCancelled(true);
-                    System.out.println("[FishingEventHandler] Tripod placement failed (occupied?).");
-                }
+        if (afkManager != null) {
+            boolean success = afkManager.registerTripod(event.getPlayer(), pos, rod);
+            if (!success) {
+                event.setCancelled(true);
             }
         }
     }

@@ -2,7 +2,7 @@ package com.masterangler.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.masterangler.mock.Player;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class PersistenceManager {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private static final String DATA_DIR = "src/main/resources/data/master_angler/players";
+    private String baseDir = "src/main/resources/data/master_angler/players"; // Default, should be set by Plugin
 
     public static class PlayerProfile {
         public int level = 1;
@@ -26,15 +26,23 @@ public class PersistenceManager {
 
     public PersistenceManager() {
         try {
-            Files.createDirectories(Paths.get(DATA_DIR));
+            Files.createDirectories(Paths.get(baseDir));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setBaseDir(Path path) {
+        this.baseDir = path.resolve("players").toString();
+        try {
+            Files.createDirectories(Paths.get(baseDir));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public PlayerProfile loadProfile(Player player) {
-        // Use Entity ID as mock UUID for now
-        File file = new File(DATA_DIR, player.getEntityId() + ".json");
+        File file = new File(baseDir, player.getUuid().toString() + ".json");
         if (!file.exists()) {
             return new PlayerProfile(); // New profile
         }
@@ -52,10 +60,10 @@ public class PersistenceManager {
         profile.level = level;
         profile.currentXp = xp;
 
-        File file = new File(DATA_DIR, player.getEntityId() + ".json");
+        File file = new File(baseDir, player.getUuid().toString() + ".json");
         try (Writer writer = new FileWriter(file)) {
             gson.toJson(profile, writer);
-            System.out.println("[Persistence] Saved profile for " + player.getName());
+            // System.out.println("[Persistence] Saved profile for " + player.getName());
         } catch (IOException e) {
             e.printStackTrace();
         }

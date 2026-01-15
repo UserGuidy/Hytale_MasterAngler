@@ -2,7 +2,7 @@ package com.masterangler.mechanics;
 
 import com.masterangler.gear.DynamicRod;
 import com.masterangler.gear.AnglerArmorManager;
-import com.masterangler.mock.Player;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 public class FishingPowerCalculator {
 
