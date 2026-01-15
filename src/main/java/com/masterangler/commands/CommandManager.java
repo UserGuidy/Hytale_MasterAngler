@@ -138,8 +138,8 @@ public class CommandManager extends AbstractCommand {
                 }
 
                 if (sessionManager.getSession(player) != null) {
-                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cYou are already fishing!"));
-                    break;
+                    sessionManager.endSession(player);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§ePrevious session cleared. Restarting cast..."));
                 }
 
                 // Create Mock Rod
@@ -174,9 +174,11 @@ public class CommandManager extends AbstractCommand {
                         sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§bFISH ON! It's a " + fishDef.getName()));
                     } else {
                          sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§eNo fish found for this simulation."));
+                         sessionManager.endSession(player); // Cleanup
                     }
                 } else {
                     sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§eSpawnManager not linked, cannot simulate bite."));
+                    sessionManager.endSession(player); // Cleanup
                 }
                 break;
 

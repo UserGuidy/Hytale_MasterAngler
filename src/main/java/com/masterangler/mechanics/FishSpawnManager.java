@@ -37,11 +37,18 @@ public class FishSpawnManager {
      * Selects a fish based on environment, bait, armor luck, and fishing power.
      */
     public FishDefinition selectFish(String biomeId, String weather, RodBait bait, Player player, float fishingPower) {
-        List<FishDefinition> availableFish = dataLoader.getAllFish().stream()
+        List<FishDefinition> allFish = dataLoader.getAllFish();
+        List<FishDefinition> availableFish = allFish.stream()
                 .filter(f -> f.getBiomeID().equalsIgnoreCase(biomeId))
                 .collect(Collectors.toList());
 
+        // Debugging
+        // System.out.println("Selecting fish: Biome=" + biomeId + ", TotalFish=" + allFish.size() + ", Filtered=" + availableFish.size());
+
         if (availableFish.isEmpty()) {
+            // Fallback for simulation if strict biome fails?
+            // For now, just return null but log it.
+            System.out.println("[Master Angler] No fish found for biome: " + biomeId + ". Loaded fish count: " + allFish.size());
             return null;
         }
 
