@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.masterangler.progression.FishingPlayerLevelManager;
 import com.masterangler.gear.FishingWorkbenchManager;
 import java.util.concurrent.CompletableFuture;
@@ -115,10 +116,11 @@ public class CommandManager extends AbstractCommand {
                 break;
 
             case "rod":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave rod components to " + player.getDisplayName()));
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave rod and components to " + player.getDisplayName()));
 
                 // Give basic components to allow testing crafting.
                 // Using namespaced IDs to ensure Hytale recognizes them from the asset pack.
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:fishing_rod", 1));
                 player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:fiberglass_body", 1));
                 player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:braided_line", 1));
                 player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:high_speed_reel", 1));
@@ -126,15 +128,73 @@ public class CommandManager extends AbstractCommand {
                 break;
 
             case "workbench":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening workbench (Logic Only)..."));
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening workbench logic... checking inventory..."));
 
-                // Real ItemStacks require defined ItemTypes or IDs
-                ItemStack body = new ItemStack("master_angler:fiberglass_body");
-                ItemStack line = new ItemStack("master_angler:braided_line");
-                ItemStack reel = new ItemStack("master_angler:high_speed_reel");
-                ItemStack bait = new ItemStack("master_angler:worm_bait");
+                // Basic workbench simulation: check for components in inventory
+                // Components needed: Body, Line, Reel.
+                // We'll search for specific items for this demo: fiberglass_body, braided_line, high_speed_reel
 
-                workbenchManager.validateAndCraft(body, line, reel, bait);
+                String bodyId = "master_angler:fiberglass_body";
+                String lineId = "master_angler:braided_line";
+                String reelId = "master_angler:high_speed_reel";
+
+                Inventory inv = player.getInventory();
+                ItemStack bodyStack = null;
+                ItemStack lineStack = null;
+                ItemStack reelStack = null;
+
+                // Helper to find item in inventory
+                // Searching hotbar
+                for (int i = 0; i < inv.getHotbar().getSize(); i++) {
+                     ItemStack s = inv.getHotbar().getItem(i);
+                     if (s != null && !s.isEmpty()) {
+                         if (s.getItemId().equals(bodyId) && bodyStack == null) bodyStack = s;
+                         if (s.getItemId().equals(lineId) && lineStack == null) lineStack = s;
+                         if (s.getItemId().equals(reelId) && reelStack == null) reelStack = s;
+                     }
+                }
+
+                // Searching storage if not found
+                if (bodyStack == null || lineStack == null || reelStack == null) {
+                     for (int i = 0; i < inv.getStorage().getSize(); i++) {
+                         ItemStack s = inv.getStorage().getItem(i);
+                         if (s != null && !s.isEmpty()) {
+                             if (s.getItemId().equals(bodyId) && bodyStack == null) bodyStack = s;
+                             if (s.getItemId().equals(lineId) && lineStack == null) lineStack = s;
+                             if (s.getItemId().equals(reelId) && reelStack == null) reelStack = s;
+                         }
+                     }
+                }
+
+                if (bodyStack != null && lineStack != null && reelStack != null) {
+                    // Consume 1 of each
+                    bodyStack.setAmount(bodyStack.getAmount() - 1);
+                    lineStack.setAmount(lineStack.getAmount() - 1);
+                    reelStack.setAmount(reelStack.getAmount() - 1);
+
+                    // Explicitly clear empty stacks if the API requires it (Safe practice)
+                    if (bodyStack.getAmount() <= 0) inv.removeItem(bodyStack);
+                    if (lineStack.getAmount() <= 0) inv.removeItem(lineStack);
+                    if (reelStack.getAmount() <= 0) inv.removeItem(reelStack);
+
+                    // Craft Rod
+                    com.masterangler.gear.DynamicRod dynamicRod = workbenchManager.validateAndCraft(
+                         new ItemStack(bodyId),
+                         new ItemStack(lineId),
+                         new ItemStack(reelId),
+                         null // No bait needed for craft
+                    );
+
+                    if (dynamicRod != null) {
+                         ItemStack rodItem = new ItemStack("master_angler:fishing_rod", 1);
+                         inv.getHotbar().addItemStack(rodItem);
+                         sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§aCrafting successful! Received Fishing Rod."));
+                    } else {
+                         sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cCrafting logic failed validation."));
+                    }
+                } else {
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cMissing components! You need: Fiberglass Body, Braided Line, High Speed Reel."));
+                }
                 break;
 
             default:
