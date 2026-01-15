@@ -47,7 +47,14 @@ public class CommandManager extends AbstractCommand {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Usage: /angler <level|xp|rod|equip|repair|workbench>"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§e--- Master Angler Commands ---"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler level <int> §7- Set fishing level (Debug)"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler xp <int> §7- Add fishing XP"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler rod §7- Get a debug fishing rod"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler equip <id> §7- Equip angler armor"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler workbench §7- Open fishing workbench"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler repair §7- Repair held rod"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cNote: Most commands require OP permission."));
             return CompletableFuture.completedFuture(null);
         }
 
