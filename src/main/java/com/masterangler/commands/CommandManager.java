@@ -21,6 +21,7 @@ public class CommandManager extends AbstractCommand {
                           com.masterangler.mechanics.RepairManager repairManager,
                           com.masterangler.gear.AnglerArmorManager armorManager) {
         super("angler", "Master Angler Commands");
+        setAllowsExtraArguments(true); // Allow subcommands/arguments
         this.levelManager = levelManager;
         this.workbenchManager = workbenchManager;
         this.repairManager = repairManager;
