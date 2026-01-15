@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.masterangler.progression.FishingPlayerLevelManager;
 import com.hypixel.hytale.math.vector.Vector3i;
+import com.masterangler.entities.FishingBobberEntity;
 
 public class FishingEventHandler {
 
@@ -54,7 +55,6 @@ public class FishingEventHandler {
 
         if (itemStack != null && !itemStack.isEmpty() && "fishing_rod".equals(itemStack.getItemId())) {
              // Mocking a rod assembly for the session
-             // In real app, we would read NBT/Components from ItemStack
              DynamicRod rod = workbenchManager.assembleRod(
                  new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"),
                  new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
@@ -65,8 +65,16 @@ public class FishingEventHandler {
             // Start Session Logic
             if (sessionManager.getSession(player) == null) {
                 sessionManager.startSession(player, rod);
-
                 FishingSession session = sessionManager.getSession(player);
+
+                // Spawn Bobber
+                FishingBobberEntity bobber = new FishingBobberEntity(player.getWorld());
+                // Set position relative to player (simple forward offset)
+                // Note: Entity positioning API assumed via setPosition or transform
+                // We'll leave exact math for visual refinement, just spawning it.
+                bobber.loadIntoWorld(player.getWorld());
+                session.setBobber(bobber);
+
                 if (spawnManager != null) {
                     float power = FishingPowerCalculator.calculateFishingPower(rod, player, armorManager);
                     com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), player, power);
@@ -75,15 +83,15 @@ public class FishingEventHandler {
                         float weight = spawnManager.generateWeight(fishDef, power);
                         float size = spawnManager.generateSize(fishDef, power);
                         session.hookFish(fishDef, weight, size);
-                        // System.out.println("Hooked: " + fishDef.getName());
                         player.sendMessage(com.hypixel.hytale.server.core.Message.raw("You hooked a " + fishDef.getName() + "!"));
+                        // Trigger Animation: FISH_BITE (later)
                     } else {
-                        // System.out.println("No fish bit.");
                         sessionManager.endSession(player);
+                        bobber.remove(); // Despawn bobber immediately if failed
                     }
                 }
             } else {
-                // If session exists, this click is likely reeling/tension control
+                // Tension Control
                 handleTensionInteraction(player);
             }
         } else if (itemStack != null && "tripod".equals(itemStack.getItemId())) {
@@ -91,24 +99,17 @@ public class FishingEventHandler {
         }
     }
 
-    // Moved logic from onPlayerMouseButton to here, called by onPlayerInteract
     private void handleTensionInteraction(Player player) {
         FishingSession session = sessionManager.getSession(player);
         if (session == null || !session.isFishHooked()) return;
 
-        // Toggle reeling state on click? Or assume holding click?
-        // Event is usually fire-once. If tension requires continuous hold, we need "Start" and "Stop" use actions.
-        // Assuming simplistic toggle or impulse for now based on 'Interact'
-
-        boolean reeling = !session.isReeling(); // Toggle
+        boolean reeling = !session.isReeling();
         session.setReeling(reeling);
 
-        // Run simulation step
         float deltaTime = 0.05f;
         float reelSpeed = session.isReeling() ? session.getRod().getReel().getReelSpeed() : 0.0f;
         float baseBreakingStrength = session.getRod().getLine().getBreakingStrength();
-        float bonusStrength = levelManager.getStrengthBonus(0); // Cannot get level directly from Player entity easily without Component, assume 0 or need helper
-        // Ideally: levelManager.getLevel(player)
+        float bonusStrength = levelManager.getStrengthBonus(0);
         float effectiveBreakingStrength = baseBreakingStrength + bonusStrength;
 
         float delta = tensionManager.calculateTensionDelta(
@@ -139,7 +140,7 @@ public class FishingEventHandler {
             player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Line broken!"));
             session.getRod().getBody().decreaseDurability(5.0f);
             checkRodDurability(player, session.getRod());
-            sessionManager.endSession(player);
+            cleanupSession(player, session);
         } else if (newProgress >= 1.0f) {
             com.masterangler.data.FishDefinition fish = session.getHookedFish();
             int xp = spawnManager.calculateXp(fish, session.getHookedFishWeight(), session.getHookedFishSize());
@@ -147,23 +148,28 @@ public class FishingEventHandler {
             levelManager.addXp(player, xp);
             session.getRod().getBody().decreaseDurability(1.0f);
             checkRodDurability(player, session.getRod());
-            sessionManager.endSession(player);
+            cleanupSession(player, session);
         }
+    }
+
+    private void cleanupSession(Player player, FishingSession session) {
+        if (session.getBobber() != null) {
+            session.getBobber().remove();
+        }
+        sessionManager.endSession(player);
     }
 
     private void checkRodDurability(Player player, DynamicRod rod) {
         if (rod.getBody().getDurability() <= 0) {
             player.sendMessage(com.hypixel.hytale.server.core.Message.raw("Your rod broke!"));
-            // In real logic: Remove item from inventory
         }
     }
 
     private void handleTripodPlacement(PlayerInteractEvent event) {
-        // UseBlockEvent logic mapped here
         Vector3i pos = event.getTargetBlock();
         if (pos == null) return;
 
-        int allowedSlots = levelManager.getAfkSlots(0); // Assume 0 level if not fetched
+        int allowedSlots = levelManager.getAfkSlots(0);
         if (allowedSlots <= 0) {
              event.setCancelled(true);
              return;
