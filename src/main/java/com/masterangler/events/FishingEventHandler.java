@@ -69,9 +69,6 @@ public class FishingEventHandler {
 
                 // Spawn Bobber
                 FishingBobberEntity bobber = new FishingBobberEntity(player.getWorld());
-                // Set position relative to player (simple forward offset)
-                // Note: Entity positioning API assumed via setPosition or transform
-                // We'll leave exact math for visual refinement, just spawning it.
                 bobber.loadIntoWorld(player.getWorld());
                 session.setBobber(bobber);
 
@@ -83,11 +80,14 @@ public class FishingEventHandler {
                         float weight = spawnManager.generateWeight(fishDef, power);
                         float size = spawnManager.generateSize(fishDef, power);
                         session.hookFish(fishDef, weight, size);
+
+                        // Trigger State: BITE
+                        bobber.setState(FishingBobberEntity.State.BITE);
+
                         player.sendMessage(com.hypixel.hytale.server.core.Message.raw("You hooked a " + fishDef.getName() + "!"));
-                        // Trigger Animation: FISH_BITE (later)
                     } else {
                         sessionManager.endSession(player);
-                        bobber.remove(); // Despawn bobber immediately if failed
+                        bobber.remove();
                     }
                 }
             } else {
@@ -105,6 +105,11 @@ public class FishingEventHandler {
 
         boolean reeling = !session.isReeling();
         session.setReeling(reeling);
+
+        // Update Bobber State
+        if (session.getBobber() != null) {
+            session.getBobber().setState(reeling ? FishingBobberEntity.State.REELING : FishingBobberEntity.State.BITE);
+        }
 
         float deltaTime = 0.05f;
         float reelSpeed = session.isReeling() ? session.getRod().getReel().getReelSpeed() : 0.0f;

@@ -6,38 +6,81 @@ import com.hypixel.hytale.server.core.universe.world.World;
 
 public class FishingBobberEntity extends Entity {
 
+    public enum State {
+        CASTING,
+        IDLE,
+        BITE,
+        REELING
+    }
+
+    private State currentState = State.CASTING;
     private boolean isInWater = false;
     private Vector3d velocity = new Vector3d(0, 0, 0);
+    private long spawnTime;
 
     public FishingBobberEntity(World world) {
         super(world);
+        this.spawnTime = System.currentTimeMillis();
     }
 
-    // In a real implementation, we would override a tick() method or register a system.
-    // For this mod, we assume there is a way to tick entities or we call it manually from a manager.
-    // Since Entity doesn't expose a public 'tick', we might rely on systems.
-    // However, to keep it simple for this phase, we add a public tick method that the SessionManager can call.
+    public void setState(State state) {
+        if (this.currentState != state) {
+            this.currentState = state;
+            playAnimation(state.name().toLowerCase()); // Mock animation trigger
+
+            if (state == State.BITE) {
+                spawnSplashParticles();
+            }
+        }
+    }
+
+    public State getState() {
+        return currentState;
+    }
 
     public void tick() {
         if (world == null) return;
 
-        // Simple Gravity
-        velocity = velocity.add(0, -0.05, 0);
+        // Simple Physics Simulation
+        if (currentState == State.CASTING) {
+            // Gravity
+            velocity = velocity.add(0, -0.05, 0);
 
-        // Simple Physics integration
+            // Mock Landing: After 1 second, land in water
+            if (System.currentTimeMillis() - spawnTime > 1000 && !isInWater) {
+                isInWater = true;
+                setState(State.IDLE);
+                spawnSplashParticles();
+            }
+        } else if (currentState == State.IDLE) {
+            // Bobbing effect
+            velocity = new Vector3d(0, Math.sin(System.currentTimeMillis() / 200.0) * 0.01, 0);
+        } else if (currentState == State.BITE) {
+            // Violent shaking
+            velocity = new Vector3d(
+                (Math.random() - 0.5) * 0.1,
+                -0.1,
+                (Math.random() - 0.5) * 0.1
+            );
+        }
+
+        // Apply velocity (Mock)
         // this.setPosition(this.getPosition().add(velocity));
-        // Note: Entity usually has getTransformComponent() or similar.
-        // We will assume a helper wrapper or just logic placeholder here.
-
-        // Mock Water Check
-        // if (world.getBlock(this.getPosition()).isWater()) {
-        //     isInWater = true;
-        //     velocity = velocity.multiply(0.8); // Drag
-        //     velocity = velocity.add(0, 0.06, 0); // Buoyancy
-        // }
     }
 
     public void setVelocity(Vector3d vel) {
         this.velocity = vel;
+    }
+
+    private void playAnimation(String animName) {
+        // In real implementation:
+        // this.getComponent(ActiveAnimationComponent.class).play(animName);
+        // System.out.println("[Bobber] Playing animation: " + animName);
+    }
+
+    private void spawnSplashParticles() {
+        // In real implementation:
+        // world.spawnParticle("splash", this.getPosition());
+        // System.out.println("[Bobber] Splash!");
     }
 }
