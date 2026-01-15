@@ -1,5 +1,5 @@
 {
-  "model": "hytale:fishing_rod",
+  "model": "hytale:stick",
   "name": "Fishing Rod",
   "rarity": "common",
   "maxStack": 1

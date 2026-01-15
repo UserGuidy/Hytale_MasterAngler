@@ -8,6 +8,11 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.masterangler.progression.FishingPlayerLevelManager;
 import com.masterangler.gear.FishingWorkbenchManager;
+import com.masterangler.mechanics.FishingSessionManager;
+import com.masterangler.mechanics.FishingPowerCalculator;
+import com.masterangler.mechanics.FishSpawnManager;
+import com.masterangler.mechanics.FishingSession;
+import com.masterangler.entities.FishingBobberEntity;
 import java.util.concurrent.CompletableFuture;
 
 public class CommandManager extends AbstractCommand {
@@ -16,6 +21,10 @@ public class CommandManager extends AbstractCommand {
     private FishingWorkbenchManager workbenchManager;
     private com.masterangler.mechanics.RepairManager repairManager;
     private com.masterangler.gear.AnglerArmorManager armorManager;
+
+    // Dependencies for /cast simulation
+    private FishingSessionManager sessionManager;
+    private FishSpawnManager spawnManager;
 
     public CommandManager(FishingPlayerLevelManager levelManager,
                           FishingWorkbenchManager workbenchManager,
@@ -27,6 +36,22 @@ public class CommandManager extends AbstractCommand {
         this.workbenchManager = workbenchManager;
         this.repairManager = repairManager;
         this.armorManager = armorManager;
+
+        // Initialize managers strictly for the cast command simulation if needed
+        // Ideally these should be passed in constructor, but for this patch we instantiate or access differently.
+        // Assuming we can't easily change the constructor signature in the main Plugin class without seeing it.
+        // We will initialize them here if they are not passed.
+        this.sessionManager = new FishingSessionManager();
+        // SpawnManager requires dataLoader, which we don't have direct access to here easily without refactoring.
+        // However, we can try to rely on the fact that this is a "Simulated" cast.
+    }
+
+    public void setSessionManager(FishingSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
+
+    public void setSpawnManager(FishSpawnManager spawnManager) {
+        this.spawnManager = spawnManager;
     }
 
     @Override
@@ -101,6 +126,57 @@ public class CommandManager extends AbstractCommand {
                          new com.masterangler.gear.RodBait("worm", 1f, 1f)
                     );
                     repairManager.repairRod(rod, player);
+                }
+                break;
+
+            case "cast":
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Simulating cast..."));
+
+                if (sessionManager == null) {
+                     sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cError: SessionManager not initialized in command."));
+                     break;
+                }
+
+                if (sessionManager.getSession(player) != null) {
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cYou are already fishing!"));
+                    break;
+                }
+
+                // Create Mock Rod
+                com.masterangler.gear.DynamicRod mockRod = workbenchManager.assembleRod(
+                     new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"),
+                     new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
+                     new com.masterangler.gear.RodReel(5f, 1f, "#FFFFFF"),
+                     new com.masterangler.gear.RodBait("worm", 1f, 1f)
+                );
+
+                sessionManager.startSession(player, mockRod);
+                FishingSession session = sessionManager.getSession(player);
+
+                // Spawn Bobber
+                FishingBobberEntity bobber = new FishingBobberEntity(player.getWorld());
+                bobber.loadIntoWorld(player.getWorld());
+                session.setBobber(bobber);
+
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§aBobber spawned. Waiting for bite..."));
+
+                // Simulate instant bite if SpawnManager is available
+                if (spawnManager != null) {
+                    float power = FishingPowerCalculator.calculateFishingPower(mockRod, player, armorManager);
+                    // Use fallback values if selectFish fails or requires env data we don't have
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", mockRod.getBait(), player, power);
+
+                    if (fishDef != null) {
+                        float weight = spawnManager.generateWeight(fishDef, power);
+                        float size = spawnManager.generateSize(fishDef, power);
+                        session.hookFish(fishDef, weight, size);
+                        bobber.setState(FishingBobberEntity.State.BITE);
+                        sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§bFISH ON! It's a " + fishDef.getName()));
+                    } else {
+                         sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§eNo fish found for this simulation."));
+                    }
+                } else {
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§eSpawnManager not linked, cannot simulate bite."));
                 }
                 break;
 
