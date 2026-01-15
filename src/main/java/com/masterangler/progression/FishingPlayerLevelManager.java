@@ -57,4 +57,10 @@ public class FishingPlayerLevelManager {
             persistenceManager.saveProfile(player, currentLevel, newXp);
         }
     }
+
+    public void setLevel(Player player, int level) {
+        if (persistenceManager != null) {
+            persistenceManager.saveProfile(player, level, 0);
+        }
+    }
 }

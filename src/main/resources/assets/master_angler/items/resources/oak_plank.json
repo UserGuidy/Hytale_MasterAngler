@@ -1,0 +1,6 @@
+{
+  "model": "master_angler:fishing_rod",
+  "name": "Oak Plank",
+  "rarity": "common",
+  "maxStack": 64
+}

@@ -63,31 +63,28 @@ public class DataLoader {
             e.printStackTrace();
         }
 
-        System.out.println("[DataLoader] Loaded " + registry.size() + " items from " + pathStr);
+        System.out.println("[Master Angler] " + registry.size() + " loaded from " + pathStr);
     }
 
     private <T> void loadSingleFile(Path path, Class<T> clazz, Map<String, T> registry) {
         try (Reader reader = new FileReader(path.toFile())) {
             T item = gson.fromJson(reader, clazz);
-            // Assuming both FishDefinition and RodComponentDefinition have a getName() via reflection or common interface would be better,
-            // but for this phase we'll cast or check.
             String name = null;
             if (item instanceof FishDefinition) name = ((FishDefinition) item).getName();
             if (item instanceof RodComponentDefinition) name = ((RodComponentDefinition) item).getId();
             if (item instanceof LootDefinition) name = ((LootDefinition) item).getId();
             if (item instanceof CrateDefinition) name = ((CrateDefinition) item).getId();
             if (item instanceof com.masterangler.gear.AnglerArmor) {
-                // Use filename as ID since AnglerArmor doesn't have an ID field yet
                 String filename = path.getFileName().toString();
                 name = filename.substring(0, filename.lastIndexOf('.'));
             }
 
             if (name != null) {
                 registry.put(name.toLowerCase(), item);
-                System.out.println("  - Loaded: " + name);
+                System.out.println("[Master Angler] Successfully registered item: " + name);
             }
         } catch (IOException e) {
-            System.err.println("Failed to load from " + path);
+            System.err.println("[Master Angler] Failed to load from " + path);
             e.printStackTrace();
         }
     }

@@ -52,6 +52,11 @@ public class FishingWorkbenchManager {
         // In real app, getItemId() returns the string ID.
         String id = item.getItemId();
 
+        // Strip namespace if present (e.g. "master_angler:fiberglass_body" -> "fiberglass_body")
+        if (id.contains(":")) {
+            id = id.split(":")[1];
+        }
+
         RodComponentDefinition def = dataLoader.getComponent(id);
 
         if (def == null) {

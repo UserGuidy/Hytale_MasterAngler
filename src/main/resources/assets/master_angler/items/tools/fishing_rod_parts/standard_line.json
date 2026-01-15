@@ -1,0 +1,6 @@
+{
+  "model": "master_angler:fishing_rod",
+  "name": "Standard Line",
+  "rarity": "common",
+  "maxStack": 64
+}

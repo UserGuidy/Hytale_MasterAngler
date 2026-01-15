@@ -21,6 +21,7 @@ public class CommandManager extends AbstractCommand {
                           com.masterangler.mechanics.RepairManager repairManager,
                           com.masterangler.gear.AnglerArmorManager armorManager) {
         super("angler", "Master Angler Commands");
+        setAllowsExtraArguments(true); // Allow subcommands/arguments
         this.levelManager = levelManager;
         this.workbenchManager = workbenchManager;
         this.repairManager = repairManager;
@@ -47,7 +48,14 @@ public class CommandManager extends AbstractCommand {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Usage: /angler <level|xp|rod|equip|repair|workbench>"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§e--- Master Angler Commands ---"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler level <int> §7- Set fishing level (Debug)"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler xp <int> §7- Add fishing XP"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler rod §7- Get a debug fishing rod"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler equip <id> §7- Equip angler armor"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler workbench §7- Open fishing workbench"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§b/angler repair §7- Repair held rod"));
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("§cNote: Most commands require OP permission."));
             return CompletableFuture.completedFuture(null);
         }
 
@@ -66,7 +74,8 @@ public class CommandManager extends AbstractCommand {
                 if (args.length < 2) break;
                 try {
                     int level = Integer.parseInt(args[1]);
-                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Set level to " + level + " (Mock Action)"));
+                    levelManager.setLevel(player, level);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Set fishing level to " + level));
                 } catch (NumberFormatException e) {
                     sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Invalid number"));
                 }
@@ -106,18 +115,24 @@ public class CommandManager extends AbstractCommand {
                 break;
 
             case "rod":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave default rod to " + player.getLegacyDisplayName()));
-                // In real impl: Add item to inventory using player.getInventory().addItem(...)
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave rod components to " + player.getDisplayName()));
+
+                // Give basic components to allow testing crafting.
+                // Using namespaced IDs to ensure Hytale recognizes them from the asset pack.
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:fiberglass_body", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:braided_line", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:high_speed_reel", 1));
+                player.getInventory().getHotbar().addItemStack(new ItemStack("master_angler:worm_bait", 5));
                 break;
 
             case "workbench":
-                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening mock workbench..."));
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening workbench (Logic Only)..."));
 
                 // Real ItemStacks require defined ItemTypes or IDs
-                ItemStack body = new ItemStack("fiberglass_body");
-                ItemStack line = new ItemStack("braided_line");
-                ItemStack reel = new ItemStack("high_speed_reel");
-                ItemStack bait = new ItemStack("worm_bait");
+                ItemStack body = new ItemStack("master_angler:fiberglass_body");
+                ItemStack line = new ItemStack("master_angler:braided_line");
+                ItemStack reel = new ItemStack("master_angler:high_speed_reel");
+                ItemStack bait = new ItemStack("master_angler:worm_bait");
 
                 workbenchManager.validateAndCraft(body, line, reel, bait);
                 break;
