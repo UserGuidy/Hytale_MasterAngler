@@ -1,371 +1,71 @@
-# Hytale Plugin Template
+# Hytale Master Angler
 
-A minimal, ready-to-use template for creating Hytale plugins with modern build tools and automated testing.
+**Hytale Master Angler** est un plugin complet pour Hytale qui transforme l'expérience de pêche en un système RPG immersif et technique. Fini le simple clic-droit : préparez votre équipement, gérez la tension de la ligne et devenez le Maître Pêcheur !
 
-> **✨ Builds immediately without any changes!** Clone and run `./gradlew shadowJar` to get a working plugin JAR.
+## 🎣 Fonctionnalités Principales
 
-## Features
+### 1. Système de Canne à Pêche Modulaire
+Créez votre propre canne à pêche unique en assemblant 4 composants distincts sur l'**Établi de Pêche** :
+*   **Corps (Body)** : Détermine la durabilité et la résistance de la canne.
+*   **Moulinet (Reel)** : Influence la vitesse de récupération (Reeling Speed).
+*   **Ligne (Line)** : Définit la tension maximale supportée avant la rupture.
+*   **Appât (Bait)** : Attire des types de poissons spécifiques (Biomes, Rareté).
 
-✅ **Modern Build System** - Gradle with Kotlin DSL  
-✅ **Automated Testing** - Custom Gradle plugin for one-command server testing  
-✅ **Java 25** - Latest Java features  
-✅ **ShadowJar** - Automatic dependency bundling  
-✅ **CI/CD Ready** - GitHub Actions workflow included  
-✅ **Minimal Structure** - Only essential files, write your own code  
+### 2. Mécanique de Tension Réaliste
+La pêche n'est plus automatique. Une fois le poisson ferré, un mini-jeu de tension s'active :
+*   Une jauge de tension (UI Client) apparaît à l'écran.
+*   Vous devez maintenir la tension dans la zone verte en moulinant ou en relâchant la ligne.
+*   Si la tension est trop forte, la ligne casse. Si elle est trop faible, le poisson s'échappe.
 
----
+### 3. Écosystème de Poissons Complet
+*   Plus de **20 espèces de poissons** uniques (Carpe, Brochet, Thon, etc.).
+*   Chaque poisson possède des statistiques générées dynamiquement : **Poids** et **Taille**.
+*   Système de rareté influencé par votre **Puissance de Pêche** (Fishing Power).
 
-## Quick Start
+### 4. Progression et RPG
+*   **Système d'XP et de Niveaux** : Gagnez de l'expérience à chaque prise. L'XP dépend de la difficulté et de la taille du poisson.
+*   **Armures de Pêcheur** : Équipez des sets complets (Chapeau, Gilet, Pantalon, Bottes) pour obtenir des bonus de statistiques et de l'XP supplémentaire.
 
-### Prerequisites
+### 5. Loot et Trésors
+En plus des poissons, vous pouvez pêcher des **Caisses de Butin** (Bois, Fer, Or) contenant des matériaux précieux pour le crafting (Fibre de carbone, Titane, etc.).
 
-- **Java 25 JDK** - [Download here](https://www.oracle.com/java/technologies/downloads/)
-- **IntelliJ IDEA** - [Download here](https://www.jetbrains.com/idea/download/) (Community Edition is fine)
-- **Git** - [Download here](https://git-scm.com/)
+## 🛠️ Installation
 
-### 1. Clone or Download
+1.  Téléchargez le fichier `Hytale_MasterAngler-1.0.0.jar` depuis les **Releases**.
+2.  Placez le fichier dans le dossier `plugins/` de votre serveur Hytale.
+3.  Lancez le serveur. Le plugin générera automatiquement les fichiers de configuration nécessaires.
 
+## 💻 Commandes
+
+La commande principale est `/angler`.
+
+| Commande | Description | Permission |
+| :--- | :--- | :--- |
+| `/angler level` | Affiche votre niveau de pêche et votre progression actuelle. | Tout le monde |
+| `/angler xp` | Affiche votre montant exact d'XP. | Tout le monde |
+| `/angler equip` | Ouvre l'interface d'équipement pour modifier votre canne. | Tout le monde |
+| `/angler rod` | Donne une canne à pêche de test (Debug). | Admin |
+| `/angler workbench` | Donne l'établi de pêche (Fishing Workbench). | Admin |
+| `/angler repair` | Restaure la durabilité de la canne en main. | Admin |
+
+## 🏗️ Développement et Build
+
+Ce projet utilise **Gradle** et **Java 21**.
+
+### Prérequis
+*   JDK 21
+*   Un fichier `HytaleServer.jar` valide (placé dans le dossier `Libs/`).
+
+### Compiler le projet
 ```bash
-git clone https://github.com/yourusername/hytale-plugin-template.git
-cd hytale-plugin-template
-```
-
-**The template builds immediately without any changes!**  
-You can customize it later when you're ready to develop your plugin.
-
-### 2. Build Immediately (No Changes Needed!)
-
-The template works out-of-the-box:
-
-```bash
-# Windows
-gradlew.bat shadowJar
-
-# Linux/Mac
 ./gradlew shadowJar
 ```
+Le fichier JAR sera généré dans `build/libs/`.
 
-Your plugin JAR will be in: `build/libs/TemplatePlugin-1.0.0.jar`
-
-### 3. Customize Your Plugin (Optional)
-
-When ready to customize, edit these files:
-
-**`settings.gradle.kts`:**
-```kotlin
-rootProject.name = "your-plugin-name"
-```
-
-**`gradle.properties`:**
-```properties
-pluginGroup=com.yourname
-pluginVersion=1.0.0
-pluginDescription=Your plugin description
-```
-
-**`src/main/resources/manifest.json`:**
-```json
-{
-  "Group": "YourName",
-  "Name": "YourPluginName",
-  "Main": "com.yourname.yourplugin.YourPlugin"
-}
-```
-
-**Rename the main plugin class:**
-- Rename `src/main/java/com/example/templateplugin/TemplatePlugin.java`
-- Update package name to match your `pluginGroup`
-
-### 4. Build Your Plugin
-
+### Tester localement
 ```bash
-# Windows
-gradlew.bat shadowJar
-
-# Linux/Mac
-./gradlew shadowJar
-```
-
-Your plugin JAR will be in: `build/libs/YourPluginName-1.0.0.jar`
-
-### 5. Implement Your Plugin
-
-Write your plugin code in `src/main/java/`:
-- Commands
-- Event listeners
-- Services
-- Storage
-- Utilities
-
-See our [documentation](../Documentation/) for examples and patterns.
-
-### 6. Test Your Plugin (Automated!)
-
-```bash
-# Windows
-gradlew.bat runServer
-
-# Linux/Mac
 ./gradlew runServer
 ```
 
-This will:
-1. Download the Hytale server (cached for future runs)
-2. Build your plugin
-3. Copy it to the server's plugins folder
-4. Start the server with interactive console
-
 ---
-
-## Project Structure
-
-```
-TemplatePlugin/
-├── .github/workflows/
-│   └── build.yml                    # CI/CD workflow
-├── buildSrc/
-│   ├── build.gradle.kts             # Custom plugin configuration
-│   └── src/main/kotlin/
-│       └── RunHytalePlugin.kt       # Automated server testing
-├── src/main/
-│   ├── java/com/example/templateplugin/
-│   │   └── TemplatePlugin.java      # Minimal main class (example)
-│   └── resources/
-│       └── manifest.json            # Plugin metadata
-├── .gitignore                       # Git ignore rules
-├── build.gradle.kts                 # Build configuration
-├── gradle.properties                # Project properties
-├── settings.gradle.kts              # Project settings
-├── LICENSE                          # MIT License
-└── README.md                        # This file
-```
-
-**Note:** This is a minimal template. Create your own folder structure:
-- `commands/` - For command implementations
-- `listeners/` - For event listeners
-- `services/` - For business logic
-- `storage/` - For data persistence
-- `utils/` - For utility classes
-- `config/` - For configuration management
-
----
-
-## Development Workflow
-
-### Building
-
-```bash
-# Compile only
-./gradlew compileJava
-
-# Build plugin JAR
-./gradlew shadowJar
-
-# Clean and rebuild
-./gradlew clean shadowJar
-```
-
-### Testing
-
-```bash
-# Run server with your plugin
-./gradlew runServer
-
-# Run unit tests
-./gradlew test
-
-# Clean test server
-rm -rf run/
-```
-
-### Debugging
-
-```bash
-# Run server in debug mode
-./gradlew runServer -Pdebug
-
-# Then connect your IDE debugger to localhost:5005
-```
-
----
-
-## Customization
-
-### Adding Dependencies
-
-Edit `build.gradle.kts`:
-
-```kotlin
-dependencies {
-    // Hytale API (provided by server)
-    compileOnly(files("libs/hytale-server.jar"))
-    
-    // Your dependencies (will be bundled)
-    implementation("com.google.code.gson:gson:2.10.1")
-    
-    // Test dependencies
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-}
-```
-
-### Configuring Server Testing
-
-**Run Hytale Server** - A Gradle plugin to download and run a Hytale server for development and testing purposes. The server files will be located in the `run/` directory of the project. Before starting the server it will compile (shadowJar task) and copy the plugin jar to the server's `plugins/` folder.
-
-**Usage:**
-
-Edit `build.gradle.kts`:
-
-```kotlin
-runHytale {
-    jarUrl = "url to hytale server jar"
-}
-```
-
-Run the server with:
-
-```bash
-# Windows
-gradlew.bat runServer
-
-# Linux/Mac
-./gradlew runServer
-```
-
-**Features:**
-- ✅ Automatic server JAR download and caching
-- ✅ Compiles and deploys your plugin automatically
-- ✅ Starts server with interactive console
-- ✅ One-command workflow: `./gradlew runServer`
-- ✅ Server files in `run/` directory (gitignored)
-
-### Implementing Your Plugin
-
-**Recommended folder structure:**
-```
-src/main/java/com/yourname/yourplugin/
-├── YourPlugin.java          # Main class
-├── commands/                # Commands
-├── listeners/               # Event listeners
-├── services/                # Business logic
-├── storage/                 # Data persistence
-├── config/                  # Configuration
-└── utils/                   # Utilities
-```
-
-**See our documentation for examples:**
-- [Getting Started with Plugins](../Documentation/07-getting-started-with-plugins.md)
-- [Advanced Plugin Patterns](../Documentation/12-advanced-plugin-patterns.md)
-- [Common Plugin Features](../Documentation/14-common-plugin-features.md)
-
----
-
-## CI/CD
-
-This template includes a GitHub Actions workflow that:
-
-1. ✅ Builds your plugin on every push
-2. ✅ Runs tests
-3. ✅ Uploads artifacts
-4. ✅ Creates releases (when you tag)
-
-### Creating a Release
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-GitHub Actions will automatically build and create a release with your plugin JAR.
-
----
-
-## Best Practices
-
-### ✅ DO:
-
-- Use the Service-Storage pattern for data management
-- Write unit tests for your business logic
-- Use structured logging (not `System.out.println`)
-- Handle errors gracefully
-- Document your public API
-- Version your releases semantically (1.0.0, 1.1.0, etc.)
-
-### ❌ DON'T:
-
-- Hardcode configuration values
-- Block the main thread with heavy operations
-- Ignore exceptions
-- Use deprecated APIs
-- Commit sensitive data (API keys, passwords)
-
----
-
-## Troubleshooting
-
-### Build Fails
-
-```bash
-# Clean and rebuild
-./gradlew clean build --refresh-dependencies
-```
-
-### Server Won't Start
-
-1. Check that `jarUrl` in `build.gradle.kts` is correct
-2. Verify Java 25 is installed: `java -version`
-3. Check logs in `run/logs/`
-
-### Plugin Not Loading
-
-1. Verify `manifest.json` has correct `Main` class
-2. Check server logs for errors
-3. Ensure all dependencies are bundled in JAR
-
----
-
-## Documentation
-
-For detailed guides on plugin development, see:
-
-- [Hytale Modding Documentation](https://github.com/yourusername/hytale-modding/tree/main/Documentation)
-- [Getting Started with Plugins](../Documentation/07-getting-started-with-plugins.md)
-- [Advanced Plugin Patterns](../Documentation/12-advanced-plugin-patterns.md)
-- [Common Plugin Features](../Documentation/14-common-plugin-features.md)
-
----
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
-## License
-
-This template is released under the MIT License. You are free to use it for any purpose.
-
----
-
-## Support
-
-- **Issues:** [GitHub Issues](https://github.com/yourusername/hytale-plugin-template/issues)
-- **Documentation:** [Hytale Modding Docs](https://github.com/yourusername/hytale-modding)
-- **Community:** Join the Hytale modding community
-
----
-
-## Credits
-
-Created by the Hytale modding community.
-
-Based on best practices from production Hytale plugins.
-
----
-
-**Happy Modding! 🎮**
+*Développé par Jules pour la communauté Hytale.*
