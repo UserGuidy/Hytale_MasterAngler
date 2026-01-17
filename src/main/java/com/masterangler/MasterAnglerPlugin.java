@@ -93,6 +93,10 @@ public class MasterAnglerPlugin extends JavaPlugin {
             repairManager,
             armorManager
         );
+        // Inject managers for simulation
+        commandManager.setSessionManager(sessionManager);
+        commandManager.setSpawnManager(spawnManager);
+
         getCommandRegistry().registerCommand(commandManager);
 
         // Start AFK Tick Loop

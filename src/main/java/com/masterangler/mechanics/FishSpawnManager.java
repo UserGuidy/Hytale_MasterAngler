@@ -37,11 +37,18 @@ public class FishSpawnManager {
      * Selects a fish based on environment, bait, armor luck, and fishing power.
      */
     public FishDefinition selectFish(String biomeId, String weather, RodBait bait, Player player, float fishingPower) {
-        List<FishDefinition> availableFish = dataLoader.getAllFish().stream()
+        List<FishDefinition> allFish = dataLoader.getAllFish();
+        List<FishDefinition> availableFish = allFish.stream()
                 .filter(f -> f.getBiomeID().equalsIgnoreCase(biomeId))
                 .collect(Collectors.toList());
 
+        // Debugging
+        // System.out.println("Selecting fish: Biome=" + biomeId + ", TotalFish=" + allFish.size() + ", Filtered=" + availableFish.size());
+
         if (availableFish.isEmpty()) {
+            // Fallback for simulation if strict biome fails?
+            // For now, just return null but log it.
+            System.out.println("[Master Angler] No fish found for biome: " + biomeId + ". Loaded fish count: " + allFish.size());
             return null;
         }
 
@@ -121,5 +128,19 @@ public class FishSpawnManager {
         float weightRatio = (weight - fish.getMinWeight()) / (fish.getMaxWeight() - fish.getMinWeight());
         float bonusMultiplier = 1.0f + weightRatio; // Up to 2x XP for max weight
         return (int) (fish.getXpReward() * bonusMultiplier);
+    }
+
+    public String mapEnvironmentToBiome(String envName) {
+        if (envName == null) return "river";
+        String lower = envName.toLowerCase();
+
+        if (lower.contains("zone1") || lower.contains("forest")) return "river";
+        if (lower.contains("zone2") || lower.contains("desert")) return "desert";
+        if (lower.contains("zone3") || lower.contains("snow") || lower.contains("ice")) return "cold";
+        if (lower.contains("zone4") || lower.contains("cave") || lower.contains("underground")) return "cave";
+        if (lower.contains("ocean") || lower.contains("beach")) return "ocean";
+
+        // Default fallback
+        return "river";
     }
 }

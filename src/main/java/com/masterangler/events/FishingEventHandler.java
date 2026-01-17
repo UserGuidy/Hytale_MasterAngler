@@ -53,7 +53,11 @@ public class FishingEventHandler {
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItemInHand();
 
-        if (itemStack != null && !itemStack.isEmpty() && "fishing_rod".equals(itemStack.getItemId())) {
+        if (itemStack != null && !itemStack.isEmpty()) {
+            System.out.println("[Master Angler] Interact with item: " + itemStack.getItemId());
+        }
+
+        if (itemStack != null && !itemStack.isEmpty() && ("master_angler:fishing_rod".equals(itemStack.getItemId()) || "fishing_rod".equals(itemStack.getItemId()))) {
              // Mocking a rod assembly for the session
              DynamicRod rod = workbenchManager.assembleRod(
                  new com.masterangler.gear.RodBody(100f, 1f, 50f, 5.0f, "#FFFFFF"),
@@ -68,13 +72,18 @@ public class FishingEventHandler {
                 FishingSession session = sessionManager.getSession(player);
 
                 // Spawn Bobber
-                FishingBobberEntity bobber = new FishingBobberEntity(player.getWorld());
+                FishingBobberEntity bobber = new FishingBobberEntity();
                 bobber.loadIntoWorld(player.getWorld());
                 session.setBobber(bobber);
 
                 if (spawnManager != null) {
                     float power = FishingPowerCalculator.calculateFishingPower(rod, player, armorManager);
-                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish("river", "clear", rod.getBait(), player, power);
+
+                    String envName = player.getWorld().getName();
+                    String mappedBiome = spawnManager.mapEnvironmentToBiome(envName);
+                    System.out.println("[Master Angler] World Name: " + envName + " -> Mapped Biome: " + mappedBiome);
+
+                    com.masterangler.data.FishDefinition fishDef = spawnManager.selectFish(mappedBiome, "clear", rod.getBait(), player, power);
 
                     if (fishDef != null) {
                         float weight = spawnManager.generateWeight(fishDef, power);

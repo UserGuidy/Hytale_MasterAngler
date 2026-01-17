@@ -16,6 +16,7 @@ repositories {
 dependencies {
     // Hytale Server API (provided by server at runtime)
     compileOnly(files("Libs/HytaleServer.jar"))
+    testImplementation(files("Libs/HytaleServer.jar"))
     
     // Common dependencies (will be bundled in JAR)
     implementation("com.google.code.gson:gson:2.10.1")
