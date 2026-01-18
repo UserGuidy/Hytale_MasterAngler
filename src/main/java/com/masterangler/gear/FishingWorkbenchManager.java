@@ -2,7 +2,7 @@ package com.masterangler.gear;
 
 import com.masterangler.data.DataLoader;
 import com.masterangler.data.RodComponentDefinition;
-import com.masterangler.mock.ItemStack;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 
 public class FishingWorkbenchManager {
 
@@ -47,20 +47,20 @@ public class FishingWorkbenchManager {
     }
 
     private Object createComponent(ItemStack item, RodComponentDefinition.ComponentType expectedType) {
-        if (item == null) return null;
+        if (item == null || item.isEmpty()) return null;
 
-        // In real app, getItem().getName() or ID should map to the JSON ID
-        // For mock, we assume the item Name IS the ID
-        String id = item.getItem().getName();
+        // In real app, getItemId() returns the string ID.
+        String id = item.getItemId();
+
         RodComponentDefinition def = dataLoader.getComponent(id);
 
         if (def == null) {
-             System.out.println("Unknown component: " + id);
+            // System.out.println("Unknown component: " + id);
              return null;
         }
 
         if (def.getType() != expectedType) {
-            System.out.println("Wrong component type. Expected " + expectedType + " but got " + def.getType());
+            // System.out.println("Wrong component type. Expected " + expectedType + " but got " + def.getType());
             return null;
         }
 

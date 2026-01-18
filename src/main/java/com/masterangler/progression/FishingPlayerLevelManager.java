@@ -1,5 +1,7 @@
 package com.masterangler.progression;
 
+import com.hypixel.hytale.server.core.entity.entities.Player;
+
 public class FishingPlayerLevelManager {
 
     private com.masterangler.data.PersistenceManager persistenceManager;
@@ -24,29 +26,30 @@ public class FishingPlayerLevelManager {
         return level >= 20;
     }
 
-    public void addXp(com.masterangler.mock.Player player, int amount) {
+    public void addXp(Player player, int amount) {
         int currentXp = 0;
-        int currentLevel = player.getLevel();
+        int currentLevel = 0; // Default to 0
 
         // Load from persistence if available
         if (persistenceManager != null) {
             com.masterangler.data.PersistenceManager.PlayerProfile profile = persistenceManager.loadProfile(player);
             currentXp = profile.currentXp;
             currentLevel = profile.level;
-            // Sync mock player with persisted data
-            player.setLevel(currentLevel);
         }
 
-        System.out.println("Player " + player.getName() + " gained " + amount + " XP.");
+        // Using simple logging for now
+        // System.out.println("Player " + player.getName() + " gained " + amount + " XP.");
 
         int newXp = currentXp + amount;
 
-        // Simple 100 XP per level
+        // Simple 100 XP per level logic from mock, ideally this curve should be configurable
         if (newXp >= 100) {
             currentLevel++;
             newXp -= 100;
-            player.setLevel(currentLevel);
-            System.out.println("LEVEL UP! " + player.getName() + " is now level " + currentLevel);
+
+            // Send message to player
+            player.sendMessage(com.hypixel.hytale.server.core.Message.raw("LEVEL UP! You are now level " + currentLevel));
+            // System.out.println("LEVEL UP! " + player.getName() + " is now level " + currentLevel);
         }
 
         // Save

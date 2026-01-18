@@ -1,13 +1,13 @@
 package com.masterangler.mechanics;
 
 import com.masterangler.gear.DynamicRod;
-import com.masterangler.mock.Player;
-// In a real implementation, Fish would be a class
-import com.masterangler.mock.BaseEntity;
+import com.masterangler.entities.FishingBobberEntity;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 public class FishingSession {
     private Player player;
     private DynamicRod rod;
+    private FishingBobberEntity bobber;
     private float currentTension = 0.0f;
     private float catchProgress = 0.0f; // 0.0 to 1.0 (100%)
     private boolean isFishHooked = false;
@@ -21,6 +21,14 @@ public class FishingSession {
     public FishingSession(Player player, DynamicRod rod) {
         this.player = player;
         this.rod = rod;
+    }
+
+    public void setBobber(FishingBobberEntity bobber) {
+        this.bobber = bobber;
+    }
+
+    public FishingBobberEntity getBobber() {
+        return bobber;
     }
 
     public Player getPlayer() {

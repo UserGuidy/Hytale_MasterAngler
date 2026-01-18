@@ -1,13 +1,15 @@
 package com.masterangler.commands;
 
-import com.masterangler.mock.Player;
+import com.hypixel.hytale.server.core.command.system.AbstractCommand;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.masterangler.progression.FishingPlayerLevelManager;
-
 import com.masterangler.gear.FishingWorkbenchManager;
-import com.masterangler.mock.Item;
-import com.masterangler.mock.ItemStack;
+import java.util.concurrent.CompletableFuture;
 
-public class CommandManager {
+public class CommandManager extends AbstractCommand {
 
     private FishingPlayerLevelManager levelManager;
     private FishingWorkbenchManager workbenchManager;
@@ -18,91 +20,112 @@ public class CommandManager {
                           FishingWorkbenchManager workbenchManager,
                           com.masterangler.mechanics.RepairManager repairManager,
                           com.masterangler.gear.AnglerArmorManager armorManager) {
+        super("angler", "Master Angler Commands");
         this.levelManager = levelManager;
         this.workbenchManager = workbenchManager;
         this.repairManager = repairManager;
         this.armorManager = armorManager;
     }
 
-    public void onCommand(Player sender, String command, String[] args) {
-        if (!command.equalsIgnoreCase("angler")) return;
+    @Override
+    public CompletableFuture<Void> execute(CommandContext context) {
+        CommandSender sender = context.sender();
+        // Parse arguments from input string.
+        // Input string usually contains the full command "angler sub arg1 arg2" or just args depending on impl.
+        // Assuming we need to split manually. If args are not parsed, we do it here.
+        // If getInputString returns "angler sub arg", splitting by space is safe.
+        String input = context.getInputString();
+        String[] parts = input.split(" ");
+        // If parts[0] is "angler", then args start at 1.
+
+        String[] args;
+        if (parts.length > 1) {
+            args = new String[parts.length - 1];
+            System.arraycopy(parts, 1, args, 0, parts.length - 1);
+        } else {
+            args = new String[0];
+        }
 
         if (args.length == 0) {
-            System.out.println("Usage: /angler <level|xp|rod>");
-            return;
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Usage: /angler <level|xp|rod|equip|repair|workbench>"));
+            return CompletableFuture.completedFuture(null);
         }
 
         String subCommand = args[0];
+        Player player = null;
+
+        if (sender instanceof Player) {
+            player = (Player) sender;
+        } else {
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("This command is for players only."));
+            return CompletableFuture.completedFuture(null);
+        }
 
         switch (subCommand.toLowerCase()) {
             case "level":
-                if (args.length < 2) return;
+                if (args.length < 2) break;
                 try {
                     int level = Integer.parseInt(args[1]);
-                    sender.setLevel(level);
-                    System.out.println("Set level to " + level);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Set level to " + level + " (Mock Action)"));
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid number");
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Invalid number"));
                 }
                 break;
 
             case "equip":
-                if (args.length < 2) return;
+                if (args.length < 2) break;
                 String armorId = args[1];
                 if (armorManager != null) {
-                    armorManager.equipArmorById(sender, armorId);
+                    armorManager.equipArmorById(player, armorId);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Equipping armor: " + armorId));
                 }
                 break;
 
             case "repair":
-                // Simulating repair of currently held rod
-                // In a real scenario, retrieve rod from Item in hand metadata
-                // For mock, we'll try to find an active session or just print mock message
-                // However, repair manager needs a DynamicRod instance.
-                // We'll mock a default rod repair for now to prove connection.
                 if (repairManager != null) {
-                    System.out.println("Attempting to repair rod (Mock)...");
-                    // Mock rod for repair command
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Attempting to repair rod..."));
                      com.masterangler.gear.DynamicRod rod = workbenchManager.assembleRod(
-                         new com.masterangler.gear.RodBody(0.0f, 1f, 50f), // Broken rod
+                         new com.masterangler.gear.RodBody(0.0f, 1f, 50f, 1.0f, "#FFF"),
                          new com.masterangler.gear.RodLine(20f, 0.5f, 10f),
-                         new com.masterangler.gear.RodReel(5f, 1f),
-                         new com.masterangler.gear.RodBait(1f, 1f)
+                         new com.masterangler.gear.RodReel(5f, 1f, "#FFF"),
+                         new com.masterangler.gear.RodBait("worm", 1f, 1f)
                     );
-                    repairManager.repairRod(rod, sender);
+                    repairManager.repairRod(rod, player);
                 }
                 break;
 
             case "xp":
-                if (args.length < 2) return;
+                if (args.length < 2) break;
                 try {
                     int xp = Integer.parseInt(args[1]);
-                    levelManager.addXp(sender, xp);
+                    levelManager.addXp(player, xp);
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Added " + xp + " XP."));
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid number");
+                    sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Invalid number"));
                 }
                 break;
 
             case "rod":
-                System.out.println("Gave default rod to " + sender.getName());
-                // In real impl: Add item to inventory
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Gave default rod to " + player.getLegacyDisplayName()));
+                // In real impl: Add item to inventory using player.getInventory().addItem(...)
                 break;
 
             case "workbench":
-                // Simulate crafting with mock items for now
-                System.out.println("Opening mock workbench...");
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Opening mock workbench..."));
 
-                // These names must match the IDs in the JSON files we created
-                ItemStack body = new ItemStack(new Item("fiberglass_body"), 1);
-                ItemStack line = new ItemStack(new Item("braided_line"), 1);
-                ItemStack reel = new ItemStack(new Item("high_speed_reel"), 1);
-                ItemStack bait = new ItemStack(new Item("worm_bait"), 1);
+                // Real ItemStacks require defined ItemTypes or IDs
+                ItemStack body = new ItemStack("fiberglass_body");
+                ItemStack line = new ItemStack("braided_line");
+                ItemStack reel = new ItemStack("high_speed_reel");
+                ItemStack bait = new ItemStack("worm_bait");
 
                 workbenchManager.validateAndCraft(body, line, reel, bait);
                 break;
 
             default:
-                System.out.println("Unknown subcommand: " + subCommand);
+                sender.sendMessage(com.hypixel.hytale.server.core.Message.raw("Unknown subcommand: " + subCommand));
         }
+
+        return CompletableFuture.completedFuture(null);
     }
 }

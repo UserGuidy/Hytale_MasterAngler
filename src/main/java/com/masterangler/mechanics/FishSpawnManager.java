@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.masterangler.gear.AnglerArmorManager;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 public class FishSpawnManager {
     private DataLoader dataLoader;
@@ -33,22 +34,11 @@ public class FishSpawnManager {
     }
 
     /**
-     * Selects a fish based on environment, bait, and armor luck.
-     *
-     * @param biomeId The current biome ID.
-     * @param weather The current weather (e.g. "rain", "clear").
-     * @param bait The bait used.
-     * @param player The player fishing (to check armor).
-     * @return A selected FishDefinition, or null if nothing bites.
-     */
-    /**
      * Selects a fish based on environment, bait, armor luck, and fishing power.
      */
-    public FishDefinition selectFish(String biomeId, String weather, RodBait bait, com.masterangler.mock.Player player, float fishingPower) {
+    public FishDefinition selectFish(String biomeId, String weather, RodBait bait, Player player, float fishingPower) {
         List<FishDefinition> availableFish = dataLoader.getAllFish().stream()
                 .filter(f -> f.getBiomeID().equalsIgnoreCase(biomeId))
-                // Filter out fish that are way too strong for the current gear (optional, or just make them hard to catch)
-                // For now, we allow hooking them but they might break the line instantly in TensionManager.
                 .collect(Collectors.toList());
 
         if (availableFish.isEmpty()) {
@@ -56,36 +46,21 @@ public class FishSpawnManager {
         }
 
         // Treasure / Crate Check
-        // Priority: Crate (if power high enough) > Fish
-        // Note: Removed "Luck" concept for treasure, now tied to power/random like fish
-
         if (crateManager != null && random.nextFloat() < 0.05f) { // 5% base chance for crate
              com.masterangler.data.CrateDefinition crate = crateManager.rollForCrate(fishingPower);
              if (crate != null) {
                  String content = crateManager.openCrate(crate);
-                 System.out.println("CRATE CAUGHT! " + crate.getName() + " -> Contains: " + content);
-                 // Return null so we don't catch a fish AND a crate
+                 player.sendMessage(com.hypixel.hytale.server.core.Message.raw("CRATE CAUGHT! " + crate.getName() + " -> " + content));
                  return null;
              }
-        } else if (lootManager != null) {
-            // Deprecated luck-based treasure logic replaced by pure randomness for now
-            // or we can reuse fishingPower as a luck factor if desired.
-            // For now, keep simple random check inside manager or skip.
-            // com.masterangler.data.LootDefinition loot = lootManager.rollForTreasure(0.0f);
         }
 
         // Weighted Fish Selection
-        // Calculate total weight
         double totalWeight = 0.0;
         java.util.Map<FishDefinition, Double> weightedMap = new java.util.HashMap<>();
 
         for (FishDefinition fish : availableFish) {
             double weight = 1.0;
-
-            // Power Bias: favor fish where Strength is close to Power
-            // If power is much higher than fish, weight is low (trash fish)
-            // If power is slightly higher/equal, weight is high
-            // If power is lower, weight is very low (too hard)
 
             float diff = fishingPower - fish.getFishStrength();
             if (diff < -5.0f) {
@@ -103,8 +78,7 @@ public class FishSpawnManager {
                 weight *= 5.0;
             }
 
-            // Rarity/Strength Multiplier (User request: rare/big fish drop more with higher power)
-            // If Fishing Power is high, boost heavier fish
+            // Rarity/Strength Multiplier
             if (fishingPower > 20.0f) {
                 weight *= (1.0f + fish.getFishStrength() * 0.1f);
             }

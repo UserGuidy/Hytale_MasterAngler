@@ -12,6 +12,10 @@ public class FishDefinition {
     private int xpReward;
     private java.util.List<String> preferredBaits; // List of bait IDs
 
+    // Visuals
+    private String icon; // Item ID for inventory icon
+    private String rarity; // COMMON, RARE, LEGENDARY
+
     public String getName() { return name; }
     public float getMinWeight() { return minWeight; }
     public float getMaxWeight() { return maxWeight; }
@@ -25,4 +29,10 @@ public class FishDefinition {
     public java.util.List<String> getPreferredBaits() {
         return preferredBaits != null ? preferredBaits : new java.util.ArrayList<>();
     }
+
+    public String getIcon() { return icon; }
+    public void setIcon(String icon) { this.icon = icon; }
+
+    public String getRarity() { return rarity != null ? rarity : "COMMON"; }
+    public void setRarity(String rarity) { this.rarity = rarity; }
 }
